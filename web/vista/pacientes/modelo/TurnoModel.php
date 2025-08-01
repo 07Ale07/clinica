@@ -5,26 +5,14 @@ class TurnoModel {
     private $db;
 
     public function __construct() {
-        global $enlace;
-        $this->db = $enlace;
+        $database = new Database();
+        $this->db = $database->getConnection();
     }
 
-    public function consultarTurnoPorDni($dni) {
-        $stmt = $this->db->prepare("
-            SELECT p.nombre, p.apellido, c.fecha, c.hora 
-            FROM citas c
-            JOIN personas p ON c.dni_paciente = p.dni
-            WHERE p.dni = ?
-        ");
-        $stmt->bind_param("s", $dni);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
-        } else {
-            return null;
-        }
+    public function crearTurno($id_persona, $id_empleado, $fecha, $hora) {
+        $stmt = $this->db->prepare("INSERT INTO citas (id_persona, id_empleado, fecha, hora) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("iiss", $id_persona, $id_empleado, $fecha, $hora);
+        return $stmt->execute();
     }
 }
 ?>

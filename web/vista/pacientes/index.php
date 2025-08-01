@@ -1,51 +1,26 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clínica Dental - Sistema de Turnos</title>
-    <link rel="stylesheet" href="public/css/estilo.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Sistema de Gestión de Turnos</h1>
-        <div class="search-box">
-            <h2>Buscar Paciente</h2>
-            <form id="searchForm">
-                <div class="form-group">
-                    <label for="dni">Número de Documento (DNI):</label>
-                    <input type="text" id="dni" name="dni" required placeholder="Ingrese DNI del paciente">
-                </div>
-                <button type="submit" class="btn">Buscar</button>
-            </form>
-        </div>
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-        <div id="patientInfo" class="hidden">
-            <h2>Información del Paciente</h2>
-            <div id="patientDetails"></div>
-        </div>
+// Definir constantes de rutas
+define('BASE_PATH', realpath(dirname(__FILE__)));
+define('VIEWS_PATH', BASE_PATH . '/vista/');
+define('CONTROLLERS_PATH', BASE_PATH . '/controlador/');
+define('MODELS_PATH', BASE_PATH . '/modelo/');
+define('PUBLIC_PATH', '/public/'); // Ruta pública desde la URL
 
-        <div id="existingAppointmentSection" class="hidden">
-            <h2>Gestión de Turno Existente</h2>
-            <div id="existingAppointmentDetails"></div>
-        </div>
+// Verificar y cargar Router.php
+$routerFile = CONTROLLERS_PATH . 'Router.php';
+if (!file_exists($routerFile)) {
+    die("<div style='color:red;'><h2>Error Crítico</h2>No se encontró Router.php en: $routerFile</div>");
+}
 
-        <div id="appointmentSection" class="hidden">
-            <h2>Asignar Nuevo Turno</h2>
-            <div id="dentistSelection"></div>
-            <div id="calendarSection" class="hidden">
-                <h3>Seleccione Fecha y Hora</h3>
-                <div id="calendar"></div>
-                <button id="confirmAppointment" class="btn hidden">Confirmar Turno</button>
-            </div>
-        </div>
+require_once $routerFile;
 
-        <div id="confirmation" class="hidden">
-            <h2>Turno Confirmado</h2>
-            <div id="appointmentDetails"></div>
-        </div>
-    </div>
-
-    <script src="public/js/script.js"></script>
-</body>
-</html>
+try {
+    $router = new Router();
+    $router->route();
+} catch (Exception $e) {
+    die("<div style='color:red;'><h2>Error en la aplicación</h2>" . $e->getMessage() . "</div>");
+}

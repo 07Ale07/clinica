@@ -1,18 +1,25 @@
+<?php
+class Database {
+    private $host = 'localhost';
+    private $user = 'root';
+    private $password = '';
+    private $database = 'clinica_dental';
+    private $conn;
 
-    <?php
-        $servidor='localhost';
-        $usuario='root';
-        $password= '';
-        $base= 'clinica_dental';
-
-
-        $enlace = new mysqli($servidor,$usuario, $password, $base);
-
-        if(!$enlace){
-            echo "no se pudo realizar la conexion:(". $enlace->connect_errno. ")".$enlace->connect_errno;
-        }else{
-            echo "";
+    public function __construct() {
+        $this->conn = new mysqli($this->host, $this->user, $this->password, $this->database);
+        
+        if ($this->conn->connect_error) {
+            die("Error de conexión: " . $this->conn->connect_error);
         }
+    }
 
+    public function getConnection() {
+        return $this->conn;
+    }
 
-    ?>
+    public function closeConnection() {
+        $this->conn->close();
+    }
+}
+?>

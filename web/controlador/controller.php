@@ -19,8 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'odontologo':
                 header('Location: ../vista/odontologos/index.php');
                 break;
-            case 'farmaceutico':
-                header('Location: ../vista/farmaceuticos/index.php');
+            case 'Farmaceutico':
+                header('Location: ../vista/farmaceuticos/index_farmacia.php');
                 break;
             case 'paciente':
                 header('Location: ../vista/pacientes/index.php');

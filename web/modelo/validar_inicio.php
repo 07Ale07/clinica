@@ -34,8 +34,8 @@ function validar_inicio_sesion($usuario, $contrasena) {
                     return 'odontologo';
                 case 2:
                     return 'paciente';
-                default:
-                    return 'farmaceutico'; 
+                case 3   :
+                    return 'Farmaceutico'; 
             }
         }
     }

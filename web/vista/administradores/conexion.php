@@ -10,7 +10,7 @@
         $servidor='localhost';
         $usuario='root';
         $password= '';
-        $base= 'clinica_dental';
+        $base= 'clinica';
 
 
         $enlace = new mysqli($servidor,$usuario, $password, $base);

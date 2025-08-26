@@ -3,7 +3,7 @@ class Database {
     private $host = 'localhost';
     private $user = 'root';
     private $password = '';
-    private $database = 'clinica_dental';
+    private $database = 'clinica';
     private $conn;
 
     public function __construct() {

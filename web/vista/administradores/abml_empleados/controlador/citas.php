@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../modelo/citas_modelo.php');
+require_once('../modelo/citas_modelo.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = $_POST['accion'];

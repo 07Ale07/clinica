@@ -4,11 +4,11 @@
     <h2>Turno Confirmado</h2>
     <div class="confirmation-message">
         <p>¡Su turno ha sido registrado exitosamente!</p>
-        <p>Fecha: <?php echo $_POST['fecha']; ?></p>
-        <p>Hora: <?php echo $_POST['hora']; ?></p>
+        <p>Fecha: <?php echo htmlspecialchars($_POST['fecha']); ?></p>
+        <p>Hora: <?php echo htmlspecialchars($_POST['hora']); ?></p>
         
         <?php if (!empty($_POST['email'])): ?>
-            <p>Se enviará una confirmación a: <?php echo $_POST['email']; ?></p>
+            <p>Se enviará una confirmación a: <?php echo htmlspecialchars($_POST['email']); ?></p>
         <?php endif; ?>
     </div>
     

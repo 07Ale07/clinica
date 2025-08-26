@@ -14,7 +14,7 @@ function validar_inicio_sesion($usuario, $contrasena) {
     // Buscar usuario con clave desencriptada
     $query = "
         SELECT u.usuario,
-               clave AS password_desencriptada,
+               clave as password_desencriptada,
                e.id_cargo
         FROM usuarios u
         JOIN cargo_empleados e ON u.id_empleado = e.id_empleado
@@ -34,8 +34,8 @@ function validar_inicio_sesion($usuario, $contrasena) {
                     return 'odontologo';
                 case 2:
                     return 'paciente';
-                default:
-                    return 'farmaceutico'; 
+                case 3   :
+                    return 'Farmaceutico'; 
             }
         }
     }

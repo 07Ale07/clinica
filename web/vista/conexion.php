@@ -1,28 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>enlace</title>
-</head>
-<body>
-    <?php
-        $servidor='localhost';
-        $usuario='root';
-        $password= '';
-        $base= 'clinica';
+<?php
+// Credenciales de la base de datos
+$servidor = 'localhost';
+$usuario = 'root';
+$password = '';
+$base = 'clinica';
 
+// Crea una nueva conexión
+$conexion = new mysqli($servidor, $usuario, $password, $base);
 
-        $enlace = new mysqli($servidor,$usuario, $password, $base);
-
-        if(!$enlace){
-            echo "no se pudo realizar la conexion:(". $enlace->connect_errno. ")".$enlace->connect_errno;
-        }else{
-            echo "";
-        }
-
-
-    ?>
-
-</body>
-</html>
+// Verifica si la conexión falló
+if ($conexion->connect_error) {
+    // Si falla, termina la ejecución y muestra el error
+    die("Error de conexión: " . $conexion->connect_error);
+}
+?>

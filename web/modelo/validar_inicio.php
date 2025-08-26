@@ -14,7 +14,7 @@ function validar_inicio_sesion($usuario, $contrasena) {
     // Buscar usuario con clave desencriptada
     $query = "
         SELECT u.usuario,
-               CAST(AES_DECRYPT(u.clave, '1234') AS CHAR) AS password_desencriptada,
+               clave as password_desencriptada,
                e.id_cargo
         FROM usuarios u
         JOIN empleados e ON u.id_empleado = e.id_empleado

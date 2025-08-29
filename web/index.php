@@ -14,8 +14,7 @@
       <p class="subtitulo">Tu salud bucal, en manos expertas</p>
       <div class="btn-group">
         <a href="vista/inicio_sesion.php" class="btn">Iniciar Sesión</a>
-        <a href="vista/pacientes/" class="btn">Consultar Turno</a>
-        <a href="vista/pacientes/" class="btn">Sacar Turno</a>
+        <a href="vista/pacientes/" class="btn">Turnos</a>
       </div>
     </div>
   </div>

@@ -14,7 +14,6 @@ unset($_SESSION['error']);
     <div class="login-container">
         <img src="https://cdn-icons-png.flaticon.com/512/3726/3726789.png" alt="Clínica Dental Logo" class="logo">
         <h2>Clínica Dental</h2>
-        <p class="subtitle">Accede a tu cuenta como paciente, odontólogo o administrador</p>
 
         <?php if ($error): ?>
             <div class="error-msg"><?php echo $error; ?></div>

@@ -3,7 +3,7 @@ require_once '../conexion.php';
 
 /**
  * Valida un usuario consultando su contraseña desencriptada.
- * Retorna el rol como string ('admin', 'odontologo', 'paciente') si es válido, o false si no.
+ * Retorna el rol como string ('admin', 'odontologo', 'paciente', 'farmaceutico') si es válido, o false si no.
  */
 function validar_inicio_sesion($usuario, $contrasena) {
     global $enlace;
@@ -11,7 +11,25 @@ function validar_inicio_sesion($usuario, $contrasena) {
     $usuario = mysqli_real_escape_string($enlace, $usuario);
     $contrasena = mysqli_real_escape_string($enlace, $contrasena);
 
-    // Buscar usuario con clave desencriptada
+    // Primero verificar si es administrador (tabla admins)
+    $query_admin = "
+        SELECT id_admin, admin, clave 
+        FROM admins 
+        WHERE admin = '$usuario' 
+        LIMIT 1
+    ";
+
+    $resultado_admin = mysqli_query($enlace, $query_admin);
+
+    if ($fila_admin = mysqli_fetch_assoc($resultado_admin)) {
+        if ($fila_admin['clave'] === $contrasena) {
+            // Es administrador válido
+            $_SESSION['id_admin'] = $fila_admin['id_admin'];
+            return 'admin';
+        }
+    }
+
+    // Si no es admin, buscar en usuarios normales
     $query = "
         SELECT u.usuario,
                clave as password_desencriptada,
@@ -34,8 +52,8 @@ function validar_inicio_sesion($usuario, $contrasena) {
                     return 'odontologo';
                 case 2:
                     return 'paciente';
-                case 3   :
-                    return 'Farmaceutico'; 
+                case 3:
+                    return 'farmaceutico'; 
             }
         }
     }

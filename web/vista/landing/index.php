@@ -71,6 +71,7 @@ $config = getCurrentConfig($conexion);
                     <?php foreach ($config['menu_items'] as $item): ?>
                         <li><a href="#"><?php echo htmlspecialchars($item); ?></a></li>
                     <?php endforeach; ?>
+                    <li><a href="../inicio_sesion.php">Iniciar Sesión</a></li>
                 </ul>
             </nav>
             <div class="nav-toggle">

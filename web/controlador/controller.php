@@ -14,7 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         switch ($rol) {
             case 'admin':
-                header('Location: ../vista/administradores/index.php');
+                
+                header('Location: ../vista/administradores/control_Admin/index.php');
                 break;
             case 'odontologo':
                 header('Location: ../vista/odontologos/index.php');

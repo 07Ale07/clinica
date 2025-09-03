@@ -15,63 +15,71 @@
     <h2>Procedimientos</h2>
     <table>
         <tr>
-            <th>ID</th>
             <th>Descripción</th>
             <th>Costo</th>
+            <th>Imagen</th>
         </tr>
         <?php foreach ($procedures as $procedure): ?>
         <tr>
-            <td><?php echo htmlspecialchars($procedure['id_procedimiento']); ?></td>
             <td><?php echo htmlspecialchars($procedure['descripcion']); ?></td>
             <td><?php echo htmlspecialchars($procedure['costo']); ?></td>
+            <td><img src="uploads/<?php echo htmlspecialchars($procedure['img']); ?>" alt="Imagen del procedimiento" width="100" height="100"></td>
+
         </tr>
         <?php endforeach; ?>
     </table>
 
-    <h2>Pacientes (3 primeros)</h2>
+    <h2>Procedimientos Realizados</h2>
     <table>
         <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>DNI</th>
-            <th>Fecha Registro</th>
-            <th>Tipo</th>
-            <th>Alergias</th>
+            <th>Paciente</th>
+            <th>Procedimiento</th>
+            <th>Fecha</th>
+            <th>Imagen Antes</th>
+            <th>Imagen Después</th>
             <th>Observaciones</th>
+            <th>Empleado</th>
         </tr>
-        <?php foreach ($patients as $patient): ?>
+        <?php foreach ($performedProcedures as $pr): ?>
         <tr>
-            <td><?php echo htmlspecialchars($patient['id_paciente']); ?></td>
-            <td><?php echo htmlspecialchars($patient['nombre']); ?></td>
-            <td><?php echo htmlspecialchars($patient['apellido']); ?></td>
-            <td><?php echo htmlspecialchars($patient['DNI']); ?></td>
-            <td><?php echo htmlspecialchars($patient['fecha_registro']); ?></td>
-            <td><?php echo htmlspecialchars($patient['tipo'] ?? 'N/A'); ?></td>
-            <td><?php echo htmlspecialchars($patient['alergias'] ?? 'N/A'); ?></td>
-            <td><?php echo htmlspecialchars($patient['observaciones_generales'] ?? 'N/A'); ?></td>
+            <td><?php echo htmlspecialchars($pr['paciente']); ?></td>
+            <td><?php echo htmlspecialchars($pr['procedimiento']); ?></td>
+            <td><?php echo htmlspecialchars($pr['fecha']); ?></td>
+            <td>
+                <?php if($pr['img_antes']): ?>
+                    <img src="uploads/<?php echo htmlspecialchars($pr['img_antes']); ?>" width="80" height="80">
+                <?php else: ?>
+                    N/A
+                <?php endif; ?>
+            </td>
+            <td>
+                <?php if($pr['img_despues']): ?>
+                    <img src="uploads/<?php echo htmlspecialchars($pr['img_despues']); ?>" width="80" height="80">
+                <?php else: ?>
+                    N/A
+                <?php endif; ?>
+            </td>
+            <td><?php echo htmlspecialchars($pr['observaciones'] ?? 'N/A'); ?></td>
+            <td><?php echo htmlspecialchars($pr['empleado'] ?? 'N/A'); ?></td>
         </tr>
         <?php endforeach; ?>
     </table>
+
 
     <h2>Empleados (3 primeros)</h2>
     <table>
         <tr>
-            <th>ID</th>
-            <th>Número Legajo</th>
             <th>Nombre</th>
             <th>Apellido</th>
-            <th>Tipo Contrato</th>
-            <th>Teléfono Interno</th>
+            <th>Foto</th>
         </tr>
         <?php foreach ($employees as $employee): ?>
         <tr>
-            <td><?php echo htmlspecialchars($employee['id_empleado']); ?></td>
-            <td><?php echo htmlspecialchars($employee['numero_legajo']); ?></td>
+
             <td><?php echo htmlspecialchars($employee['nombre']); ?></td>
             <td><?php echo htmlspecialchars($employee['apellido']); ?></td>
-            <td><?php echo htmlspecialchars($employee['tipo_contrato']); ?></td>
-            <td><?php echo htmlspecialchars($employee['telefono_interno'] ?? 'N/A'); ?></td>
+            <td><img src="uploads/<?php echo htmlspecialchars($employee['foto']); ?>" alt="Foto de <?php echo htmlspecialchars($employee['apellido']); ?>" width="80" height="80"></td>
+
         </tr>
         <?php endforeach; ?>
     </table>
@@ -79,29 +87,15 @@
     <h2>Obras Sociales</h2>
     <table>
         <tr>
-            <th>ID</th>
             <th>Nombre</th>
-            <th>Código Nacional</th>
-            <th>CUIT</th>
             <th>Teléfono</th>
-            <th>Email</th>
             <th>Dirección</th>
-            <th>Página Web</th>
-            <th>Requiere Autorización</th>
-            <th>Días Carencia</th>
         </tr>
         <?php foreach ($socialWorks as $socialWork): ?>
         <tr>
-            <td><?php echo htmlspecialchars($socialWork['id_obra_social']); ?></td>
             <td><?php echo htmlspecialchars($socialWork['nombre']); ?></td>
-            <td><?php echo htmlspecialchars($socialWork['codigo_nacional']); ?></td>
-            <td><?php echo htmlspecialchars($socialWork['cuit']); ?></td>
             <td><?php echo htmlspecialchars($socialWork['telefono']); ?></td>
-            <td><?php echo htmlspecialchars($socialWork['email']); ?></td>
             <td><?php echo htmlspecialchars($socialWork['direccion']); ?></td>
-            <td><?php echo htmlspecialchars($socialWork['pagina_web']); ?></td>
-            <td><?php echo $socialWork['requiere_autorizacion'] ? 'Sí' : 'No'; ?></td>
-            <td><?php echo htmlspecialchars($socialWork['dias_carencia']); ?></td>
         </tr>
         <?php endforeach; ?>
     </table>

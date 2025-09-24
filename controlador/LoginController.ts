@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 import { LoginResponse, LoginCredentials, LoginModel } from '../modelo/LoginModel';
 import { apiService } from '../src/services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export class LoginController {
   static async handleLogin(
@@ -19,6 +20,17 @@ export class LoginController {
       const response: LoginResponse = await apiService.login(credentials);
 
       if (response.success && response.rol) {
+        // Almacenar datos del usuario en AsyncStorage
+        await AsyncStorage.setItem('id_usuario', response.id_usuario.toString());
+        await AsyncStorage.setItem('username', response.username || 'Usuario');
+        await AsyncStorage.setItem('fullName', response.fullName || 'Nombre Completo');
+        await AsyncStorage.setItem('jobTitle', response.jobTitle || response.rol);
+        console.log('Datos almacenados en AsyncStorage:', {
+          id_usuario: response.id_usuario,
+          username: response.username,
+          fullName: response.fullName,
+          jobTitle: response.jobTitle,
+        });
         onSuccess(response.rol);
       } else {
         onError(response.message || 'Usuario o contraseña incorrectos');

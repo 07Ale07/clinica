@@ -1,118 +1,88 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'react-native';
-
-interface Patient {
-  id: string;
-  name: string;
-  lastVisit: string;
-  diagnosis: string;
-}
-
-const mockPatients: Patient[] = [
-  { id: '1', name: 'Sofía Ramírez', lastVisit: '2025-08-15', diagnosis: 'Caries tratada' },
-  { id: '2', name: 'Pedro Alvarez', lastVisit: '2025-07-20', diagnosis: 'Ortodoncia en curso' },
-  { id: '3', name: 'Lucía Torres', lastVisit: '2025-06-10', diagnosis: 'Limpieza dental' },
-];
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TextInput, ActivityIndicator } from 'react-native';
+import { PatientHistory } from '../modelo/historial_modelo';
+import { HistorialControl } from '../controlador/historial_controlador';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Feather } from '@expo/vector-icons';
+import { styles } from '../css/historialStyles';
 
 const Historial: React.FC = () => {
   const [search, setSearch] = useState('');
+  const [patients, setPatients] = useState<PatientHistory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredPatients = mockPatients.filter((patient) =>
+  useEffect(() => {
+    const fetchHistorial = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const id_usuario = await AsyncStorage.getItem('id_usuario');
+        if (id_usuario) {
+          const fetchedPatients = await HistorialControl.getPatientHistory(id_usuario);
+          setPatients(fetchedPatients);
+        } else {
+          setError('No se encontró el ID de usuario. Por favor, vuelva a iniciar sesión.');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error desconocido al cargar el historial.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHistorial();
+  }, []);
+
+  const filteredPatients = patients.filter((patient) =>
     patient.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const renderPatient = ({ item }: { item: Patient }) => (
+  const renderPatient = ({ item }: { item: PatientHistory }) => (
     <View style={styles.patientItem}>
       <Text style={styles.patientText}>{item.name}</Text>
       <Text style={styles.patientSubText}>Última visita: {item.lastVisit}</Text>
       <Text style={styles.patientSubText}>Diagnóstico: {item.diagnosis}</Text>
-      <TouchableOpacity style={styles.viewButton}>
-        <Text style={styles.viewButtonText}>Ver Detalles</Text>
-      </TouchableOpacity>
     </View>
   );
 
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#4B9CDB" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Historial de Mis Pacientes</Text>
-      <Text style={styles.subtitle}>Busca y revisa el historial médico de tus pacientes</Text>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Buscar paciente..."
-        value={search}
-        onChangeText={setSearch}
-      />
+      <View style={styles.searchContainer}>
+        <Feather name="search" size={24} color="#4B9CDB" style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar paciente..."
+          placeholderTextColor="#8A8F9E"
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
       <FlatList
         data={filteredPatients}
         renderItem={renderPatient}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        ListEmptyComponent={<Text style={styles.noItemsText}>No hay pacientes en el historial.</Text>}
       />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 20,
-  },
-  searchInput: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  list: {
-    paddingBottom: 20,
-  },
-  patientItem: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  patientText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  patientSubText: {
-    fontSize: 14,
-    color: '#666',
-    marginVertical: 5,
-  },
-  viewButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-    padding: 8,
-    alignSelf: 'flex-end',
-  },
-  viewButtonText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-});
 
 export default Historial;

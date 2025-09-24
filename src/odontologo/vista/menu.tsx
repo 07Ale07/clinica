@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface MenuOption {
+export interface MenuOption {
   name: string;
   icon: keyof typeof Ionicons.glyphMap;
 }

@@ -1,133 +1,96 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'react-native';
-
-interface InventoryItem {
-  id: string;
-  name: string;
-  quantity: number;
-  category: string;
-}
-
-const mockInventory: InventoryItem[] = [
-  { id: '1', name: 'Anestesia Lidocaína', quantity: 50, category: 'Medicamentos' },
-  { id: '2', name: 'Fresas Dentales', quantity: 20, category: 'Herramientas' },
-  { id: '3', name: 'Guantes Desechables', quantity: 200, category: 'Consumibles' },
-];
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { InventarioControl } from '../controlador/inventario_controlador';
+import { InventoryItem } from '../modelo/inventario_modelo';
+import { Feather } from '@expo/vector-icons';
+import { styles } from '../css/inventarioStyles';
 
 const Inventario: React.FC = () => {
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [filteredInventory, setFilteredInventory] = useState<InventoryItem[]>([]);
   const [search, setSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredInventory = mockInventory.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    const loadInventory = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await InventarioControl.fetchInventario();
+        setInventory(data);
+        setFilteredInventory(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error desconocido al cargar el inventario.');
+        Alert.alert('Error', error || 'Error al cargar');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadInventory();
+  }, []);
+
+  useEffect(() => {
+    const filtered = inventory.filter((item) =>
+      item.nombre.toLowerCase().includes(search.toLowerCase()) ||
+      item.descripcion.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredInventory(filtered);
+  }, [search, inventory]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
+  };
 
   const renderItem = ({ item }: { item: InventoryItem }) => (
     <View style={styles.item}>
-      <Text style={styles.itemText}>{item.name}</Text>
+      <Text style={styles.itemText}>{item.nombre}</Text>
       <Text style={styles.itemSubText}>Categoría: {item.category}</Text>
       <Text style={styles.itemSubText}>Cantidad: {item.quantity}</Text>
-      <TouchableOpacity style={styles.updateButton}>
-        <Text style={styles.updateButtonText}>Actualizar</Text>
-      </TouchableOpacity>
+      <Text style={styles.itemSubText}>Descripción: {item.descripcion}</Text>
+      <Text style={styles.itemSubText}>Última actualización: {formatDate(item.fecha_actualizacion)}</Text>
     </View>
   );
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#4B9CDB" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Inventario</Text>
-      <Text style={styles.subtitle}>Controla los medicamentos y herramientas disponibles</Text>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Buscar en inventario..."
-        value={search}
-        onChangeText={setSearch}
-      />
+      <View style={styles.searchContainer}>
+        <Feather name="search" size={24} color="#4B9CDB" style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar por nombre o descripción..."
+          placeholderTextColor="#8A8F9E"
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
       <FlatList
         data={filteredInventory}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
+        ListEmptyComponent={<Text style={styles.noItemsText}>No hay items en el inventario.</Text>}
       />
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addButtonText}>+ Agregar Item</Text>
-      </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 20,
-  },
-  searchInput: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  list: {
-    paddingBottom: 20,
-  },
-  item: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  itemText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  itemSubText: {
-    fontSize: 14,
-    color: '#666',
-    marginVertical: 5,
-  },
-  updateButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-    padding: 8,
-    alignSelf: 'flex-end',
-  },
-  updateButtonText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-  addButton: {
-    backgroundColor: '#28a745',
-    borderRadius: 10,
-    padding: 15,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
 export default Inventario;

@@ -1,110 +1,182 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Horario } from '../modelo/horarioModel';
+import { TurnoControl } from '../controlador/turno_control';
+import { styles } from '../css/horariosStyles';
 
-interface Schedule {
-  id: string;
-  time: string;
-  patient: string;
-  procedure: string;
-  status: string;
-}
-
-const mockSchedules: Schedule[] = [
-  { id: '1', time: '2025-08-31 09:00', patient: 'Carlos Sánchez', procedure: 'Ortodoncia', status: 'Confirmado' },
-  { id: '2', time: '2025-08-31 11:30', patient: 'Laura Martínez', procedure: 'Blanqueamiento', status: 'Pendiente' },
-  { id: '3', time: '2025-09-01 15:00', patient: 'Diego Fernández', procedure: 'Consulta', status: 'Confirmado' },
-];
+const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 const Horarios: React.FC = () => {
-  const renderSchedule = ({ item }: { item: Schedule }) => (
+  const [horarios, setHorarios] = useState<Horario[]>([]);
+  const [availableDays, setAvailableDays] = useState<string[]>([]);
+  const [selectedDay, setSelectedDay] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const getCurrentDay = (): string => {
+    const today = new Date().getDay();
+    return diasSemana[today === 0 ? 6 : today - 1]; // Adjust for Sunday
+  };
+
+  const formatDateToYYYYMMDD = (date: Date): string => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const fetchHorarios = async (dia: string, id_empleado: string, fecha: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const horariosData = await TurnoControl.getHorariosOdontologo(id_empleado, dia, fecha);
+      setHorarios(horariosData);
+    } catch (err) {
+      console.error('Error fetching horarios:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido al cargar los horarios.');
+      setHorarios([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchAvailableDays = async (id_empleado: string) => {
+    try {
+      const availableDaysData = await Promise.all(
+        diasSemana.map(async (dia) => {
+          try {
+            const horarios = await TurnoControl.getHorariosOdontologo(id_empleado, dia, formatDateToYYYYMMDD(new Date()));
+            return horarios.length > 0 ? dia : null;
+          } catch (err) {
+            console.error(`Error fetching horarios for ${dia}:`, err);
+            return null;
+          }
+        })
+      );
+      const filteredDays = availableDaysData.filter((dia): dia is string => dia !== null);
+      setAvailableDays(filteredDays);
+      return filteredDays;
+    } catch (err) {
+      console.error('Error fetching available days:', err);
+      setError(err instanceof Error ? err.message : 'Error al cargar los días disponibles.');
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const initializeHorarios = async () => {
+      try {
+        const id_empleado = await AsyncStorage.getItem('id_usuario');
+        if (!id_empleado) {
+          setError('No se encontró el ID de usuario. Por favor, vuelva a iniciar sesión.');
+          return;
+        }
+
+        const today = getCurrentDay();
+        const todayDate = formatDateToYYYYMMDD(new Date());
+        let diaToFetch = today;
+        let fechaToFetch = todayDate;
+
+        // Get available days
+        const available = await fetchAvailableDays(id_empleado);
+        if (available.length === 0) {
+          setError('No hay horarios disponibles para ningún día.');
+          return;
+        }
+
+        // Get schedules for today
+        try {
+          const horariosToday = await TurnoControl.getHorariosOdontologo(id_empleado, today, todayDate);
+          if (horariosToday.length === 0) {
+            // If no schedules for today, fetch next working day
+            const proximoDia = await TurnoControl.getProximoDiaLaboral(id_empleado, new Date());
+            diaToFetch = proximoDia.dia_semana;
+            fechaToFetch = proximoDia.fecha;
+          }
+        } catch (err) {
+          console.error('Error checking today\'s schedules:', err);
+          // If error, just use the first available day
+          diaToFetch = available[0];
+          fechaToFetch = formatDateToYYYYMMDD(new Date());
+        }
+
+        setSelectedDay(diaToFetch);
+        setSelectedDate(fechaToFetch);
+        await fetchHorarios(diaToFetch, id_empleado, fechaToFetch);
+      } catch (err) {
+        console.error('Error initializing horarios:', err);
+        setError(err instanceof Error ? err.message : 'Error al inicializar los horarios.');
+      }
+    };
+
+    initializeHorarios();
+  }, []);
+
+  const handleDayChange = async (itemValue: string) => {
+    if (!itemValue) return;
+    
+    setSelectedDay(itemValue);
+    const id_empleado = await AsyncStorage.getItem('id_usuario');
+    if (id_empleado) {
+      const fecha = selectedDate || formatDateToYYYYMMDD(new Date());
+      await fetchHorarios(itemValue, id_empleado, fecha);
+    }
+  };
+
+  const renderSchedule = ({ item }: { item: Horario }) => (
     <View style={styles.scheduleItem}>
-      <Text style={styles.scheduleText}>{item.time} - {item.patient}</Text>
-      <Text style={styles.scheduleSubText}>{item.procedure} - {item.status}</Text>
-      <TouchableOpacity style={styles.editButton}>
-        <Text style={styles.editButtonText}>Editar</Text>
-      </TouchableOpacity>
+      <Text style={styles.scheduleText}>{item.dia_semana}: {item.hora_inicio} - {item.hora_fin}</Text>
+      <Text style={styles.scheduleSubText}>Estado: {item.activo ? 'Activo' : 'Inactivo'}</Text>
+      {item.fecha_desde && (
+        <Text style={styles.scheduleSubText}>Desde: {item.fecha_desde}</Text>
+      )}
+      {item.fecha_hasta && (
+        <Text style={styles.scheduleSubText}>Hasta: {item.fecha_hasta}</Text>
+      )}
     </View>
   );
+
+  if (isLoading && horarios.length === 0) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#4B9CDB" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Gestión de Turnos y Horarios</Text>
-      <Text style={styles.subtitle}>Administra las citas y horarios de la clínica</Text>
-      <FlatList
-        data={mockSchedules}
-        renderItem={renderSchedule}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-      />
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addButtonText}>+ Nuevo Turno</Text>
-      </TouchableOpacity>
+      <View style={styles.dayPicker}>
+        <Picker
+          selectedValue={selectedDay}
+          style={{ height: 50 }}
+          onValueChange={handleDayChange}
+        >
+          {availableDays.length > 0 ? (
+            availableDays.map((dia) => (
+              <Picker.Item key={dia} label={dia} value={dia} />
+            ))
+          ) : (
+            <Picker.Item label="No hay días disponibles" value="" />
+          )}
+        </Picker>
+      </View>
+      {error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : horarios.length > 0 ? (
+        <FlatList
+          data={horarios}
+          renderItem={renderSchedule}
+          keyExtractor={(item) => item.id_horario.toString()}
+          contentContainerStyle={styles.list}
+        />
+      ) : (
+        <Text style={styles.noSchedulesText}>
+          No hay horarios disponibles para {selectedDay || 'este día'}.
+        </Text>
+      )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 20,
-  },
-  list: {
-    paddingBottom: 20,
-  },
-  scheduleItem: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  scheduleText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  scheduleSubText: {
-    fontSize: 14,
-    color: '#666',
-    marginVertical: 5,
-  },
-  editButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-    padding: 8,
-    alignSelf: 'flex-end',
-  },
-  editButtonText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-  addButton: {
-    backgroundColor: '#28a745',
-    borderRadius: 10,
-    padding: 15,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
 export default Horarios;

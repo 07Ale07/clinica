@@ -1,16 +1,18 @@
-// src/navigation/types.ts
+import { Turno } from '../odontologo/modelo/turnoModel';
+
 export type RootStackParamList = {
-    Login: undefined;
-    Odontologo: undefined;
-    TurnoScreen: undefined;
-    RegistrarPacienteScreen: undefined;
-    ListaPacientesScreen: undefined;
-    // Puedes agregar más rutas aquí según necesites
-  };
-  
-  // Extiende los tipos de navegación por defecto
-  declare global {
-    namespace ReactNavigation {
-      interface RootParamList extends RootStackParamList {}
-    }
+  Login: undefined;
+  Odontologo: undefined;
+  TurnoScreen: undefined;
+  RegistrarPacienteScreen: undefined;
+  ListaPacientesScreen: undefined;
+  OdontologoDashboard: undefined; // Unique name for odontólogo screen
+  DetallePaciente: { paciente: Turno };
+  TurnoConsulta: undefined;
+};
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
   }
+}

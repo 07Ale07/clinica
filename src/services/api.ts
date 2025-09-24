@@ -1,7 +1,9 @@
-import axios from 'axios';
-import { LoginResponse, LoginCredentials } from '../../modelo/LoginModel'; 
+// File: ../../services/api.ts
 
-export const API_BASE_URL = 'http://10.0.13.99:3000';
+import axios, { AxiosResponse } from 'axios';
+import { LoginResponse, LoginCredentials } from '../../modelo/LoginModel';
+
+export const API_BASE_URL = 'http://172.16.225.180:3000';
 
 export const apiService = {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
@@ -13,6 +15,16 @@ export const apiService = {
       return response.data;
     } catch (error) {
       console.error('Error en la petición de login:', error);
+      throw new Error('No se pudo conectar con el servidor');
+    }
+  },
+
+  async get<T>(url: string): Promise<AxiosResponse<T>> {
+    try {
+      const response = await axios.get<T>(`${API_BASE_URL}${url}`);
+      return response;
+    } catch (error) {
+      console.error(`Error en la petición GET a ${url}:`, error);
       throw new Error('No se pudo conectar con el servidor');
     }
   },

@@ -9,6 +9,7 @@ export type RootStackParamList = {
   OdontologoDashboard: undefined; // Unique name for odontólogo screen
   DetallePaciente: { paciente: Turno };
   TurnoConsulta: undefined;
+  OdontogramaScreen: { idPaciente: number };
 };
 
 declare global {

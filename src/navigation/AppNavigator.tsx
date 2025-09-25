@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import LoginView from '../../vistas/LoginView';
 import OdontoloVista from '../odontologo/vista/odontologo_vista';
 import DetallePaciente from '../odontologo/vista/DetallePaciente';
+import OdontogramaScreen from '../odontologo/vista/OdontogramaScreen';
 import { RootStackParamList } from './types';
 import CustomDrawerContent from './CustomDrawerContent';
 import TurnoVista from '../turnos/vista/turno_vista';
@@ -53,6 +54,11 @@ const AppNavigator: React.FC = () => {
           name="TurnoConsulta"
           component={TurnoVista}
           options={{ title: 'Consultar Turno' }}
+        />
+        <Stack.Screen 
+          name="OdontogramaScreen"
+          component={OdontogramaScreen}
+          options={{ title: 'Odontograma' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -20,17 +20,12 @@ export class LoginController {
       const response: LoginResponse = await apiService.login(credentials);
 
       if (response.success && response.rol) {
-        // Almacenar datos del usuario en AsyncStorage
-        await AsyncStorage.setItem('id_usuario', response.id_usuario.toString());
-        await AsyncStorage.setItem('username', response.username || 'Usuario');
-        await AsyncStorage.setItem('fullName', response.fullName || 'Nombre Completo');
-        await AsyncStorage.setItem('jobTitle', response.jobTitle || response.rol);
-        console.log('Datos almacenados en AsyncStorage:', {
-          id_usuario: response.id_usuario,
-          username: response.username,
-          fullName: response.fullName,
-          jobTitle: response.jobTitle,
-        });
+        // Almacenar id_usuario en AsyncStorage
+        if (response.id_usuario) {
+          await AsyncStorage.setItem('id_usuario', response.id_usuario.toString());
+        } else {
+          console.warn('id_usuario no incluido en la respuesta de la API');
+        }
         onSuccess(response.rol);
       } else {
         onError(response.message || 'Usuario o contraseña incorrectos');

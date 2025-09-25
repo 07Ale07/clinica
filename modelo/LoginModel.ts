@@ -3,9 +3,6 @@ export interface LoginResponse {
   success: boolean;
   rol?: string;
   message?: string;
-  username: string;
-  fullName: string;
-  jobTitle: string;
 }
 
 export interface LoginCredentials {

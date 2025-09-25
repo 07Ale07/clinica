@@ -6,4 +6,5 @@ export interface Turno {
   nombre_paciente: string;
   tipo: 'consulta' | 'tratamiento' | 'control';
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada' | 'no_asistio';
+  id_paciente: number; // Agregar esto si no está
 }

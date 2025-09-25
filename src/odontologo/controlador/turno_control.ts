@@ -11,6 +11,7 @@ interface RawCita {
   nombre_paciente: string;
   tipo: 'consulta' | 'tratamiento' | 'control';
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada' | 'no_asistio';
+  id_paciente: number;
 }
 
 // Define the raw API response type for horarios
@@ -71,6 +72,7 @@ export class TurnoControl {
         nombre_paciente: cita.nombre_paciente,
         tipo: cita.tipo,
         estado: cita.estado,
+        id_paciente: cita.id_paciente,
       }));
       return turnos;
     } catch (error) {

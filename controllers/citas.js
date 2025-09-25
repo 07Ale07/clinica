@@ -22,7 +22,7 @@ router.get('/citas', async (req, res) => {
     console.log(`Consultando turnos para DNI: ${dni}`); // Log para depuración
     // Consulta para obtener información del paciente y sus citas
     const [turnos] = await pool.query(`
-      SELECT pe.nombre, pe.apellido, c.tipo AS motivo, c.fecha_inicio AS fecha, c.estado
+      SELECT pe.nombre, pe.apellido, c.id_paciente, c.tipo AS motivo, c.fecha_inicio AS fecha, c.estado
       FROM pacientes p
       JOIN personas pe ON p.id_persona = pe.id_persona
       JOIN citas c ON p.id_paciente = c.id_paciente

@@ -56,7 +56,7 @@ router.get('/citas/odontologo/:id_usuario', async (req, res) => {
   try {
     // Consulta corregida: unión con pacientes y personas para obtener el nombre del paciente desde la tabla personas
     const query = `
-      SELECT c.id_cita, c.fecha_inicio, pe.nombre AS nombre_paciente, c.tipo, c.estado
+      SELECT c.id_cita, c.id_paciente, c.fecha_inicio, pe.nombre AS nombre_paciente, c.tipo, c.estado
       FROM citas c
       JOIN pacientes p ON c.id_paciente = p.id_paciente
       JOIN personas pe ON p.id_persona = pe.id_persona

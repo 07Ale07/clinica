@@ -2,9 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const authController = require('./controllers/authController');
 const turnosRoutes = require('./controllers/turnos');
-const citasRoutes = require('./controllers/citas'); // Nueva importación para citas
+const citasRoutes = require('./controllers/citas');
 const historialRoutes = require('./controllers/historial');
 const inventarioRoutes = require('./controllers/inventario');
+const pacientesRoutes = require('./controllers/pacientes'); // Importar pacientes.js
 
 const app = express();
 const port = 3000;
@@ -26,11 +27,13 @@ app.use('/', historialRoutes);
 // Usar rutas de inventario
 app.use('/', inventarioRoutes);
 
+// Usar rutas de pacientes
+app.use('/', pacientesRoutes); // Registrar rutas de pacientes
+
 // Ruta básica de prueba
 app.get('/', (req, res) => {
   res.send('La API está funcionando');
 });
-
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Servidor corriendo en http://localhost:${port} (accesible por IP local)`);

@@ -28,7 +28,7 @@ app.use('/', historialRoutes);
 app.use('/', inventarioRoutes);
 
 // Usar rutas de pacientes
-app.use('/', pacientesRoutes); // Registrar rutas de pacientes
+app.use('/pacientes', pacientesRoutes); // Registrar rutas de pacientes
 
 // Ruta básica de prueba
 app.get('/', (req, res) => {

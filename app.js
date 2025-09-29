@@ -1,3 +1,4 @@
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const authController = require('./controllers/authController');
@@ -5,7 +6,9 @@ const turnosRoutes = require('./controllers/turnos');
 const citasRoutes = require('./controllers/citas');
 const historialRoutes = require('./controllers/historial');
 const inventarioRoutes = require('./controllers/inventario');
-const pacientesRoutes = require('./controllers/pacientes'); // Importar pacientes.js
+const pacientesRoutes = require('./controllers/pacientes');
+const odontogramaRoutes = require('./controllers/odontograma');
+const sacarTurnoRoutes = require('./controllers/sacar_turno');
 
 const app = express();
 const port = 3000;
@@ -28,7 +31,13 @@ app.use('/', historialRoutes);
 app.use('/', inventarioRoutes);
 
 // Usar rutas de pacientes
-app.use('/pacientes', pacientesRoutes); // Registrar rutas de pacientes
+app.use('/pacientes', pacientesRoutes);
+
+// Usar rutas de odontograma
+app.use('/', odontogramaRoutes);
+
+// Usar rutas de sacar turno
+app.use('/api/sacar_turno', sacarTurnoRoutes);
 
 // Ruta básica de prueba
 app.get('/', (req, res) => {
@@ -38,3 +47,4 @@ app.get('/', (req, res) => {
 app.listen(port, '0.0.0.0', () => {
   console.log(`Servidor corriendo en http://localhost:${port} (accesible por IP local)`);
 });
+

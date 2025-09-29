@@ -1,34 +1,33 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: '#F7FAFD',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#E6F0FA', // Light blue background matching dental theme
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    padding: 20,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F7FAFD',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    marginBottom: 20,
     paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: '#D1E6F9',
+    marginBottom: 20,
     shadowColor: '#8A8F9E',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowRadius: 4,
+    elevation: 3,
   },
   searchIcon: {
     marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    height: 50,
-    fontSize: 16,
+    height: 40,
     color: '#333',
   },
   list: {
@@ -36,41 +35,35 @@ export const styles = StyleSheet.create({
   },
   item: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
-    shadowColor: '#8A8F9E', // Gray shadow
-    shadowOffset: { width: 0, height: 4 },
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+    shadowColor: '#8A8F9E',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
-    borderLeftWidth: 4,
-    borderLeftColor: '#4B9CDB', // Blue accent
-    transform: [{ translateY: 0 }], // For potential animations
+    shadowRadius: 4,
+    elevation: 3,
   },
   itemText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1B2C40', // Dark blue
-    marginBottom: 5,
+    color: '#4B9CDB',
   },
   itemSubText: {
-    fontSize: 16,
-    color: '#6A7A8A', // Gray
-    marginVertical: 5,
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
   },
   errorText: {
-    color: '#D9534F', // Red for errors
-    textAlign: 'center',
     fontSize: 16,
+    color: '#FF6B6B',
+    textAlign: 'center',
     marginTop: 20,
-    fontWeight: '500',
   },
   noItemsText: {
-    textAlign: 'center',
     fontSize: 16,
-    color: '#6A7A8A', // Gray
+    color: '#666',
+    textAlign: 'center',
     marginTop: 20,
-    fontStyle: 'italic',
   },
 });

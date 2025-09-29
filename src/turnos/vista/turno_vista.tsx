@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { TurnoController } from '../controlador/TurnoController';
 import { TurnoInfo } from '../modelo/TurnoModel';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,7 +14,6 @@ const TurnoVista: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Solicitar permisos para el calendario al montar el componente
   useEffect(() => {
     (async () => {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
@@ -33,7 +33,7 @@ const TurnoVista: React.FC = () => {
       if (result.length === 0) {
         setError('No existe ese DNI en mis registros');
       } else {
-        console.log('Turnos recibidos:', result); // Log para depuración
+        console.log('Turnos recibidos:', result);
         setTurnos(result);
       }
     } catch (err) {
@@ -43,16 +43,46 @@ const TurnoVista: React.FC = () => {
     }
   };
 
+  const handleCancelTurno = async (id_cita: number) => {
+    Alert.alert(
+      'Confirmar Cancelación',
+      '¿Estás seguro de que deseas cancelar este turno?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Confirmar',
+          onPress: async () => {
+            try {
+              setIsLoading(true);
+              await TurnoController.cancelTurno(id_cita);
+              const updatedTurnos = turnos.map(turno =>
+                turno.id_cita === id_cita ? { ...turno, estado: 'cancelada' } : turno
+              );
+              setTurnos(updatedTurnos);
+              Alert.alert('Éxito', 'El turno ha sido cancelado.');
+            } catch (error: any) {
+              Alert.alert('Error', error.message || 'No se pudo cancelar el turno.');
+            } finally {
+              setIsLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const getTurnoStatus = (fecha: string, estado: string | undefined) => {
-    const now = new Date(); // Hora actual
+    const now = new Date();
     const turnoDate = new Date(fecha);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalizar a medianoche para comparación por día
-    turnoDate.setSeconds(0, 0); // Normalizar segundos y milisegundos para comparación precisa
-    const normalizedEstado = estado ? estado.toLowerCase() : 'pendiente'; // Asumir 'pendiente' si estado es undefined
-    console.log('Estado del turno:', normalizedEstado); // Log para depuración
+    today.setHours(0, 0, 0, 0);
+    turnoDate.setSeconds(0, 0);
+    const normalizedEstado = estado ? estado.toLowerCase() : 'pendiente';
+    console.log('Estado del turno:', normalizedEstado);
 
-    // Determinar si el turno está expirado, pasado de hora o completado
     const isDateBeforeToday = turnoDate < today;
     const isTodayAndPastTime = turnoDate.getTime() === today.getTime() && now > turnoDate;
     const isExpired = isDateBeforeToday && normalizedEstado !== 'completada';
@@ -61,13 +91,13 @@ const TurnoVista: React.FC = () => {
     return {
       isCompleted: normalizedEstado === 'completada',
       isExpired: isExpired,
-      isPastTime: isPastTime
+      isPastTime: isPastTime,
+      isPending: normalizedEstado === 'pendiente'
     };
   };
 
   const addToCalendar = async (turno: TurnoInfo) => {
     try {
-      // Obtener el calendario predeterminado para eventos
       const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
       const defaultCalendar = calendars.find(cal => cal.allowsModifications);
       
@@ -76,10 +106,9 @@ const TurnoVista: React.FC = () => {
         return;
       }
 
-      // Verificar si ya existe un evento para este turno
       const turnoDate = new Date(turno.fecha);
       const startDate = new Date(turnoDate);
-      startDate.setDate(turnoDate.getDate() - 2); // Buscar eventos en un rango de 2 días antes
+      startDate.setDate(turnoDate.getDate() - 2);
       const endDate = new Date(turnoDate);
       const events = await Calendar.getEventsAsync([defaultCalendar.id], startDate, endDate);
       const eventExists = events.some(event => event.title === `Recordatorio: Turno ${turno.motivo}`);
@@ -89,7 +118,6 @@ const TurnoVista: React.FC = () => {
         return;
       }
 
-      // Mostrar diálogo para elegir 1 o 2 días antes
       Alert.alert(
         'Elegir recordatorio',
         '¿Cuándo desea añadir el recordatorio?',
@@ -118,15 +146,15 @@ const TurnoVista: React.FC = () => {
     try {
       const turnoDate = new Date(turno.fecha);
       const eventDate = new Date(turnoDate);
-      eventDate.setDate(turnoDate.getDate() - daysBefore); // Establecer 1 o 2 días antes
+      eventDate.setDate(turnoDate.getDate() - daysBefore);
 
       const eventDetails = {
         title: `Recordatorio: Turno ${turno.motivo}`,
         startDate: eventDate,
-        endDate: new Date(eventDate.getTime() + 60 * 60 * 1000), // Duración de 1 hora
+        endDate: new Date(eventDate.getTime() + 60 * 60 * 1000),
         notes: `Turno para ${turno.nombre} ${turno.apellido} el ${turnoDate.toLocaleString()}`,
         calendarId,
-        alarms: [{ relativeOffset: -15 }], // Alarma 15 minutos antes
+        alarms: [{ relativeOffset: -15 }],
       };
 
       await Calendar.createEventAsync(calendarId, eventDetails);
@@ -138,101 +166,114 @@ const TurnoVista: React.FC = () => {
   };
 
   return (
-    <LinearGradient
-      colors={['#4B9CDB', '#E6F0FA']}
-      style={styles.container}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <SafeAreaView style={styles.safeArea}>
+      <LinearGradient
+        colors={['#4B9CDB', '#E6F0FA']}
         style={styles.container}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
       >
-        <ScrollView 
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.container}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
         >
-          <Animatable.View 
-            animation="fadeInDown"
-            duration={1000}
-            style={styles.headerContainer}
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
           >
-            <Text style={styles.title}>Consultar Turno</Text>
-          </Animatable.View>
-
-          <Animatable.View 
-            animation="fadeInUp"
-            duration={1200}
-            style={styles.formContainer}
-          >
-            <View style={styles.inputContainer}>
-              <Feather name="search" size={24} color="#4B9CDB" style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su DNI"
-                placeholderTextColor="#8A8F9E"
-                value={dni}
-                onChangeText={setDni}
-                keyboardType="numeric"
-                editable={!isLoading}
-              />
-            </View>
-
-            <TouchableOpacity
-              onPress={handleConsultar}
-              disabled={isLoading}
-              style={styles.button}
+            <Animatable.View 
+              animation="fadeInDown"
+              duration={1000}
+              style={styles.headerContainer}
             >
-              <LinearGradient
-                colors={['#4B9CDB', '#2A6EBB']}
-                style={styles.buttonGradient}
+              <Text style={styles.title}>Consultar Turno</Text>
+            </Animatable.View>
+
+            <Animatable.View 
+              animation="fadeInUp"
+              duration={1200}
+              style={styles.formContainer}
+            >
+              <View style={styles.inputContainer}>
+                <Feather name="search" size={24} color="#4B9CDB" style={styles.icon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ingrese su DNI"
+                  placeholderTextColor="#8A8F9E"
+                  value={dni}
+                  onChangeText={setDni}
+                  keyboardType="numeric"
+                  editable={!isLoading}
+                />
+              </View>
+
+              <TouchableOpacity
+                onPress={handleConsultar}
+                disabled={isLoading}
+                style={styles.button}
               >
-                <Text style={styles.buttonText}>
-                  {isLoading ? 'Consultando...' : 'Consultar'}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                <LinearGradient
+                  colors={['#4B9CDB', '#2A6EBB']}
+                  style={styles.buttonGradient}
+                >
+                  <Text style={styles.buttonText}>
+                    {isLoading ? 'Consultando...' : 'Consultar'}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
 
-            {error && (
-              <Text style={styles.errorText}>{error}</Text>
-            )}
+              {error && (
+                <Text style={styles.errorText}>{error}</Text>
+              )}
 
-            {turnos.map((turno, index) => {
-              const { isCompleted, isExpired, isPastTime } = getTurnoStatus(turno.fecha, turno.estado);
-              return (
-                <View key={index} style={styles.turnoContainer}>
-                  <Text style={styles.turnoTitle}>¿Es tu turno?</Text>
-                  <Text style={styles.turnoInfo}>Nombre: {turno.nombre} {turno.apellido}</Text>
-                  <Text style={styles.turnoInfo}>Turno Motivo: {turno.motivo}</Text>
-                  <Text style={styles.turnoInfo}>Fecha: {turno.fecha}</Text>
-                  <Text style={styles.turnoInfo}>Estado: {turno.estado || 'No especificado'}</Text>
-                  {isCompleted && (
-                    <Text style={styles.completedText}>Turno atendido</Text>
-                  )}
-                  {isPastTime && (
-                    <Text style={styles.pastTimeText}>Turno pasado de hora</Text>
-                  )}
-                  {isExpired && !isPastTime && (
-                    <Text style={styles.expiredText}>Este turno expiró</Text>
-                  )}
-                  {!isCompleted && !isExpired && !isPastTime && (
-                    <TouchableOpacity 
-                      style={styles.recordatorioButton}
-                      onPress={() => addToCalendar(turno)}
-                    >
-                      <Text style={styles.recordatorioText}>Añadir Recordatorio</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              );
-            })}
-          </Animatable.View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </LinearGradient>
+              {turnos.map((turno, index) => {
+                const { isCompleted, isExpired, isPastTime, isPending } = getTurnoStatus(turno.fecha, turno.estado);
+                return (
+                  <View key={index} style={styles.turnoContainer}>
+                    <Text style={styles.turnoTitle}>¿Es tu turno?</Text>
+                    <Text style={styles.turnoInfo}>Nombre: {turno.nombre} {turno.apellido}</Text>
+                    <Text style={styles.turnoInfo}>Turno Motivo: {turno.motivo}</Text>
+                    <Text style={styles.turnoInfo}>Fecha: {turno.fecha}</Text>
+                    <Text style={styles.turnoInfo}>Estado: {turno.estado || 'No especificado'}</Text>
+                    {isCompleted && (
+                      <Text style={styles.completedText}>Turno atendido</Text>
+                    )}
+                    {isPastTime && (
+                      <Text style={styles.pastTimeText}>Turno pasado de hora</Text>
+                    )}
+                    {isExpired && !isPastTime && (
+                      <Text style={styles.expiredText}>Este turno expiró</Text>
+                    )}
+                    {!isCompleted && !isExpired && !isPastTime && isPending && (
+                      <>
+                        <TouchableOpacity 
+                          style={styles.recordatorioButton}
+                          onPress={() => addToCalendar(turno)}
+                        >
+                          <Text style={styles.recordatorioText}>Añadir Recordatorio</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          style={styles.cancelButton}
+                          onPress={() => handleCancelTurno(turno.id_cita)}
+                        >
+                          <Text style={styles.cancelText}>Cancelar Turno</Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
+                  </View>
+                );
+              })}
+            </Animatable.View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </LinearGradient>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
   },
@@ -325,6 +366,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  cancelButton: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  cancelText: {
+    color: '#FF4444',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   expiredText: {
     color: '#FF4444',
     fontSize: 16,
@@ -338,7 +388,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   pastTimeText: {
-    color: '#FF8C00', // Naranja para diferenciar de expirado y completado
+    color: '#FF8C00',
     fontSize: 16,
     fontWeight: '600',
     marginTop: 5,

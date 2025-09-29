@@ -1,4 +1,5 @@
 export interface TurnoInfo {
+  id_cita: number;
   nombre: string;
   apellido: string;
   motivo: string;

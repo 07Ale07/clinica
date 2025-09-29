@@ -117,12 +117,34 @@ const LoginView: React.FC = () => {
               </LinearGradient>
             </TouchableOpacity>
           </Animatable.View>
+        </Animatable.View>
 
+        <Animatable.View
+          animation="fadeInUp"
+          duration={1200}
+          style={styles.actionButtonsContainer}
+        >
           <TouchableOpacity
             onPress={() => navigation.navigate('TurnoConsulta')}
-            style={styles.consultButton}
+            style={styles.actionButton}
           >
-            <Text style={styles.consultButtonText}>Consultar Turno</Text>
+            <LinearGradient
+              colors={['#4B9CDB', '#2A6EBB']}
+              style={styles.actionButtonGradient}
+            >
+              <Text style={styles.actionButtonText}>Consultar Turno</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('SacarTurno')}
+            style={styles.actionButton}
+          >
+            <LinearGradient
+              colors={['#4B9CDB', '#2A6EBB']}
+              style={styles.actionButtonGradient}
+            >
+              <Text style={styles.actionButtonText}>Sacar Turno</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </Animatable.View>
       </KeyboardAvoidingView>
@@ -205,12 +227,33 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-  consultButton: {
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 20,
-    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 10,
+    height: 80, // Fixed height for rectangular shape
+    shadowColor: '#8A8F9E',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  consultButtonText: {
-    color: '#4B9CDB',
+  actionButton: {
+    flex: 0.48, // Each button takes ~48% to allow spacing
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  actionButtonGradient: {
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%', // Fill container height
+  },
+  actionButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },

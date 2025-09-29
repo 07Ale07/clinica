@@ -4,6 +4,8 @@ import { InventarioControl } from '../controlador/inventario_controlador';
 import { InventoryItem } from '../modelo/inventario_modelo';
 import { Feather } from '@expo/vector-icons';
 import { styles } from '../css/inventarioStyles';
+import CustomHeader from '../../navigation/CustomHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Inventario: React.FC = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
@@ -54,42 +56,37 @@ const Inventario: React.FC = () => {
     </View>
   );
 
-  if (isLoading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#4B9CDB" />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Feather name="search" size={24} color="#4B9CDB" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar por nombre o descripción..."
-          placeholderTextColor="#8A8F9E"
-          value={search}
-          onChangeText={setSearch}
-        />
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <CustomHeader title="Inventario" showBackButton={true} showMenuButton={true} />
+      <View style={styles.container}>
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#4B9CDB" />
+        ) : error ? (
+          <Text style={styles.errorText}>{error}</Text>
+        ) : (
+          <>
+            <View style={styles.searchContainer}>
+              <Feather name="search" size={24} color="#4B9CDB" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Buscar por nombre o descripción..."
+                placeholderTextColor="#8A8F9E"
+                value={search}
+                onChangeText={setSearch}
+              />
+            </View>
+            <FlatList
+              data={filteredInventory}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={styles.list}
+              ListEmptyComponent={<Text style={styles.noItemsText}>No hay items en el inventario.</Text>}
+            />
+          </>
+        )}
       </View>
-      <FlatList
-        data={filteredInventory}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={<Text style={styles.noItemsText}>No hay items en el inventario.</Text>}
-      />
-    </View>
+    </SafeAreaView>
   );
 };
 

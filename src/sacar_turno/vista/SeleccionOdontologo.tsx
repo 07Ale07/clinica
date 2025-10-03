@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert } from 'react-native';
+import { View, Text, TextInput, Button, Alert, Platform, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { obtenerOdontologos, obtenerHorariosDisponibles, confirmarTurno } from '../controlador/SacarTurnoController';
 import { Odontologo, Turno, Paciente } from '../modelo/Paciente';
 import { globalStyles } from '../css/styles';
@@ -13,7 +14,8 @@ interface Props {
 const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado }) => {
     const [odontologos, setOdontologos] = useState<Odontologo[]>([]);
     const [idOdontologo, setIdOdontologo] = useState<number | null>(null);
-    const [fecha, setFecha] = useState('');
+    const [fecha, setFecha] = useState<Date | null>(null);
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const [hora, setHora] = useState('');
     const [horarios, setHorarios] = useState<string[]>([]);
     const [email, setEmail] = useState('');
@@ -35,7 +37,7 @@ const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado }) =
         if (idOdontologo !== null && fecha) {
             async function fetchHorarios() {
                 try {
-                    const lista = await obtenerHorariosDisponibles(idOdontologo, fecha);
+                    const lista = await obtenerHorariosDisponibles(idOdontologo, formatToISO(fecha));
                     setHorarios(lista);
                     setHora('');
                 } catch (err) {
@@ -45,6 +47,30 @@ const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado }) =
             fetchHorarios();
         }
     }, [idOdontologo, fecha]);
+
+    const formatDate = (date: Date | null): string => {
+        if (!date) return '';
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
+    const formatToISO = (date: Date | null): string => {
+        if (!date) return '';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const handleDateChange = (event: any, selectedDate?: Date) => {
+        const currentDate = selectedDate || fecha;
+        setShowDatePicker(Platform.OS === 'ios');
+        if (selectedDate) {
+            setFecha(currentDate);
+        }
+    };
 
     const validateForm = (): boolean => {
         if (!idOdontologo) {
@@ -82,7 +108,7 @@ const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado }) =
             if (idOdontologo === null) {
                 throw new Error('Odontólogo no seleccionado');
             }
-            const turno: Turno = { id_odontologo: idOdontologo, fecha, hora, email };
+            const turno: Turno = { id_odontologo: idOdontologo, fecha: formatToISO(fecha), hora, email };
             const confirmado = await confirmarTurno(paciente.id_persona!, turno);
             onTurnoConfirmado(confirmado);
         } catch (err: any) {
@@ -103,12 +129,23 @@ const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado }) =
                     <Picker.Item key={odo.id_persona} label={`${odo.nombre} ${odo.apellido}`} value={odo.id_persona} />
                 ))}
             </Picker>
-            <TextInput
+            <TouchableOpacity
                 style={globalStyles.input}
-                placeholder="Fecha (YYYY-MM-DD)"
-                value={fecha}
-                onChangeText={setFecha}
-            />
+                onPress={() => setShowDatePicker(true)}
+            >
+                <Text style={fecha ? globalStyles.inputText : globalStyles.placeholderText}>
+                    {fecha ? formatDate(fecha) : 'Fecha (DD/MM/YYYY)'}
+                </Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+                <DateTimePicker
+                    value={fecha || new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={handleDateChange}
+                    minimumDate={new Date()}
+                />
+            )}
             <Picker
                 selectedValue={hora}
                 onValueChange={(value) => setHora(value as string)}

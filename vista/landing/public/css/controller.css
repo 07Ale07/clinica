@@ -1,0 +1,205 @@
+
+/* landing/public/css/controller.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+.controlador-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.controlador-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+}
+
+.controlador-header h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.controlador-header p {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    font-weight: 500;
+}
+
+.controlador-header i {
+    color: #3498db;
+    margin-right: 10px;
+}
+
+.opciones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    flex: 1;
+}
+
+.opcion-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border-top: 4px solid #3498db;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.opcion-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.opcion-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.opcion-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.opcion-card h2 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.opcion-card p {
+    color: #7f8c8d;
+    margin-bottom: 2rem;
+    flex: 1;
+}
+
+/* Botones */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+    background: linear-gradient(135deg, #2980b9, #3498db);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+}
+
+.btn-outline {
+    background: transparent;
+    color: #3498db;
+    border-color: #3498db;
+}
+
+.btn-outline:hover {
+    background: #3498db;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.controlador-footer {
+    text-align: center;
+    padding: 2rem 0;
+    border-top: 1px solid #e0e0e0;
+    margin-top: auto;
+}
+
+.controlador-footer p {
+    color: #7f8c8d;
+    margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .opciones-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .controlador-header h1 {
+        font-size: 2rem;
+    }
+    
+    .opcion-card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .controlador-container {
+        padding: 15px;
+    }
+    
+    .controlador-header {
+        padding: 1.5rem 0;
+    }
+    
+    .controlador-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .opcion-icon {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .opcion-icon i {
+        font-size: 1.7rem;
+    }
+}

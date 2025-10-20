@@ -1,0 +1,173 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f9ff;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  /* Hero principal */
+  .hero {
+    position: relative;
+    height: 100vh;
+    background: linear-gradient(to bottom right, #0072ff, #00c6ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    max-width: 600px;
+  }
+  
+  .logo {
+    width: 100px;
+    margin-bottom: 20px;
+  }
+  
+  .hero h1 {
+    font-size: 3em;
+    margin-bottom: 10px;
+  }
+  
+  .subtitulo {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    font-weight: 300;
+  }
+  
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+  
+  .btn {
+    padding: 15px 40px;
+    font-size: 18px;
+    background-color: #fff;
+    color: #0072ff;
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+    font-weight: 600;
+    width: 250px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn:hover {
+    background-color: #e6f0ff;
+    color: #005bcc;
+    transform: scale(1.05);
+  }
+  
+  
+  /* Info Section */
+  .info {
+    padding: 60px 20px;
+    background-color: #fff;
+  }
+  
+  .container {
+    max-width: 1000px;
+    margin: auto;
+    text-align: center;
+  }
+  
+  .info h2 {
+    font-size: 2.2em;
+    margin-bottom: 20px;
+    color: #0072ff;
+  }
+  
+  .features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 40px;
+    gap: 30px;
+  }
+  
+  .feature {
+    background-color: #f0f8ff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 114, 255, 0.1);
+    max-width: 300px;
+    text-align: left;
+  }
+  
+  .feature h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #0056cc;
+  }
+  
+  /* Footer */
+  footer {
+    background-color: #002f66;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+  }
+  /* Animación entrada */
+.hidden {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.6s ease-out;
+  }
+  
+  .visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Transición de botones */
+  .btn {
+    transition: transform 0.2s ease, background 0.3s ease;
+  }
+/* Animación entrada inicial */
+.hero-content {
+    opacity: 0;
+    transform: translateY(-30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+  
+  .hero-content.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Efecto scroll: se achica un poco y se desvanece */
+  .hero-content.scrolled-down {
+    opacity: 0.6;
+    transform: scale(0.98) translateY(-10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  
+  .hero-content.scrolled-up {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+    

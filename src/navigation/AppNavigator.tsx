@@ -1,4 +1,3 @@
-// Updated AppNavigator.tsx
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -133,9 +132,7 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="SacarTurno"
           component={SacarTurnoMain}
-          options={{
-            header: () => <CustomHeader title="Sacar Turno" showBackButton={true} showMenuButton={true} />,
-          }}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

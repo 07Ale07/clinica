@@ -1,66 +1,60 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView } from 'react-native';
-import { LoginController } from '../controlador/LoginController';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../src/navigation/types';
-import * as Animatable from 'react-native-animatable';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+"use client"
 
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+import type React from "react"
+import { useState } from "react"
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView } from "react-native"
+import { LoginController } from "../controlador/LoginController"
+import { useNavigation } from "@react-navigation/native"
+import type { StackNavigationProp } from "@react-navigation/stack"
+import type { RootStackParamList } from "../src/navigation/types"
+import * as Animatable from "react-native-animatable"
+import { LinearGradient } from "expo-linear-gradient"
+import { Feather } from "@expo/vector-icons"
+
+type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, "Login">
 
 const LoginView: React.FC = () => {
-  const [usuario, setUsuario] = useState<string>('');
-  const [contrasena, setContrasena] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+  const [usuario, setUsuario] = useState<string>("")
+  const [contrasena, setContrasena] = useState<string>("")
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+
+  const navigation = useNavigation<LoginScreenNavigationProp>()
 
   const handleLogin = async () => {
-    setIsLoading(true);
-    
+    setIsLoading(true)
+
     await LoginController.handleLogin(
       { usuario, contrasena },
       (rol) => {
-        setIsLoading(false);
-        if (rol === 'odontólogo') {
-          navigation.navigate('Odontologo');
+        setIsLoading(false)
+        if (rol === "odontólogo") {
+          navigation.navigate("Odontologo")
+        } else if (rol === "recepcionista") {
+          navigation.navigate("Recepcionista")
         } else {
-          navigation.navigate('Home');
+          navigation.navigate("Home")
         }
       },
       (errorMessage) => {
-        setIsLoading(false);
-      }
-    );
-  };
+        setIsLoading(false)
+      },
+    )
+  }
 
   return (
-    <LinearGradient
-      colors={['#4B9CDB', '#E6F0FA']}
-      style={styles.container}
-    >
+    <LinearGradient colors={["#4B9CDB", "#E6F0FA"]} style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingContainer}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <Animatable.View 
-          animation="fadeInDown"
-          duration={1000}
-          style={styles.headerContainer}
-        >
+        <Animatable.View animation="fadeInDown" duration={1000} style={styles.headerContainer}>
           <Text style={styles.title}>DENTAL SMILE</Text>
           <Text style={styles.subtitle}>Tus Prioridades, a Mano</Text>
         </Animatable.View>
 
-        <Animatable.View 
-          animation="fadeInUp"
-          duration={1200}
-          style={styles.formContainer}
-        >
+        <Animatable.View animation="fadeInUp" duration={1200} style={styles.formContainer}>
           <View style={styles.inputContainer}>
             <Feather name="user" size={24} color="#4B9CDB" style={styles.icon} />
             <TextInput
@@ -84,120 +78,83 @@ const LoginView: React.FC = () => {
               secureTextEntry={!showPassword}
               editable={!isLoading}
             />
-            <TouchableOpacity 
-              onPress={() => setShowPassword(!showPassword)}
-              style={styles.eyeIcon}
-            >
-              <Feather 
-                name={showPassword ? "eye-off" : "eye"} 
-                size={20} 
-                color="#4B9CDB" 
-              />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+              <Feather name={showPassword ? "eye-off" : "eye"} size={20} color="#4B9CDB" />
             </TouchableOpacity>
           </View>
 
-          <Animatable.View
-            animation="pulse"
-            iterationCount="infinite"
-            duration={2000}
-            style={styles.buttonContainer}
-          >
-            <TouchableOpacity
-              onPress={handleLogin}
-              disabled={isLoading}
-              style={styles.button}
-            >
-              <LinearGradient
-                colors={['#4B9CDB', '#2A6EBB']}
-                style={styles.buttonGradient}
-              >
-                <Text style={styles.buttonText}>
-                  {isLoading ? 'Cargando...' : 'Iniciar Sesión'}
-                </Text>
+          <Animatable.View animation="pulse" iterationCount="infinite" duration={2000} style={styles.buttonContainer}>
+            <TouchableOpacity onPress={handleLogin} disabled={isLoading} style={styles.button}>
+              <LinearGradient colors={["#4B9CDB", "#2A6EBB"]} style={styles.buttonGradient}>
+                <Text style={styles.buttonText}>{isLoading ? "Cargando..." : "Iniciar Sesión"}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </Animatable.View>
         </Animatable.View>
 
-        <Animatable.View
-          animation="fadeInUp"
-          duration={1200}
-          style={styles.actionButtonsContainer}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.navigate('TurnoConsulta')}
-            style={styles.actionButton}
-          >
-            <LinearGradient
-              colors={['#4B9CDB', '#2A6EBB']}
-              style={styles.actionButtonGradient}
-            >
+        <Animatable.View animation="fadeInUp" duration={1200} style={styles.actionButtonsContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate("TurnoConsulta")} style={styles.actionButton}>
+            <LinearGradient colors={["#4B9CDB", "#2A6EBB"]} style={styles.actionButtonGradient}>
               <Text style={styles.actionButtonText}>Consultar Turno</Text>
             </LinearGradient>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('SacarTurno')}
-            style={styles.actionButton}
-          >
-            <LinearGradient
-              colors={['#4B9CDB', '#2A6EBB']}
-              style={styles.actionButtonGradient}
-            >
+          <TouchableOpacity onPress={() => navigation.navigate("SacarTurno")} style={styles.actionButton}>
+            <LinearGradient colors={["#4B9CDB", "#2A6EBB"]} style={styles.actionButtonGradient}>
               <Text style={styles.actionButtonText}>Sacar Turno</Text>
             </LinearGradient>
           </TouchableOpacity>
         </Animatable.View>
       </KeyboardAvoidingView>
     </LinearGradient>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E6F0FA',
+    backgroundColor: "#E6F0FA",
   },
   keyboardAvoidingContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 20,
   },
   headerContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 40,
   },
   title: {
     fontSize: 36,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 4,
   },
   subtitle: {
     fontSize: 18,
-    color: '#D1E6F9',
+    color: "#D1E6F9",
     marginTop: 8,
   },
   formContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 15,
     padding: 20,
-    shadowColor: '#8A8F9E',
+    shadowColor: "#8A8F9E",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F7FAFD',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F7FAFD",
     borderRadius: 10,
     marginBottom: 15,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: '#D1E6F9',
+    borderColor: "#D1E6F9",
   },
   icon: {
     marginRight: 10,
@@ -206,7 +163,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   eyeIcon: {
     padding: 10,
@@ -216,47 +173,47 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   buttonGradient: {
     paddingVertical: 15,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   actionButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 15,
     padding: 10,
-    height: 80, // Fixed height for rectangular shape
-    shadowColor: '#8A8F9E',
+    height: 80,
+    shadowColor: "#8A8F9E",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
   actionButton: {
-    flex: 0.48, // Each button takes ~48% to allow spacing
+    flex: 0.48,
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   actionButtonGradient: {
     paddingVertical: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%', // Fill container height
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
   },
   actionButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
-});
+})
 
-export default LoginView;
+export default LoginView

@@ -2,6 +2,7 @@ import type React from "react"
 import { createStackNavigator } from "@react-navigation/stack"
 import { createDrawerNavigator } from "@react-navigation/drawer"
 import { NavigationContainer } from "@react-navigation/native"
+import LandingView from "../landing/vista/LandingView"
 import LoginView from "../../vistas/LoginView"
 import Odontolo from "../odontologo/vista/Odontologo"
 import Turnos from "../odontologo/vista/odontologo_vista"
@@ -101,7 +102,8 @@ const RecepcionisaStackNavigator: React.FC = () => {
 const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Landing">
+        <Stack.Screen name="Landing" component={LandingView} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginView} options={{ headerShown: false }} />
         <Stack.Screen name="Odontologo" component={MainDrawer} options={{ headerShown: false }} />
         <Stack.Screen name="Recepcionista" component={RecepcionisaStackNavigator} options={{ headerShown: false }} />

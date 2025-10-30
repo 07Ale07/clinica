@@ -74,7 +74,7 @@ const LandingView: React.FC = () => {
 
           <TouchableOpacity style={landingStyles.loginButton} onPress={handleLogin}>
             <Ionicons name="log-in-outline" size={20} color="#1a4b8c" />
-            <Text style={landingStyles.loginButtonText}>Iniciar Sesión</Text>
+            <Text style={landingStyles.loginButtonText}>Iniciar Sesión, Ver y Sacar Turnos</Text>
           </TouchableOpacity>
         </View>
 

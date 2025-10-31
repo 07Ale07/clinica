@@ -3,7 +3,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { LoginResponse, LoginCredentials } from '../../modelo/LoginModel';
 
-export const API_BASE_URL = 'http://192.168.0.19:3000';
+export const API_BASE_URL = 'http://10.0.10.117:3000';
 
 export const apiService = {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {

@@ -28,7 +28,7 @@ const RecepcionistaMain: React.FC = () => {
     {
       title: "Sacar Turno",
       icon: "plus-circle",
-      screen: "SacarTurnoRecep" as const,
+      screen: "SacarTurno" as const,
       color: ["#F0AD4E", "#EC971F"],
     },
     {

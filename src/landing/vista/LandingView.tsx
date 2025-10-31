@@ -44,7 +44,7 @@ const LandingView: React.FC = () => {
   }, [data.procedures.length])
 
   const handleWhatsApp = () => {
-    const phoneNumber = "3704376847"
+    const phoneNumber = "3704037812"
     const message = "Hola, me interesa saber más sobre sus servicios"
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
     Linking.openURL(url)

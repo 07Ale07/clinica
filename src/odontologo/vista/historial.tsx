@@ -1,13 +1,28 @@
+// screens/historial.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TextInput, ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TextInput,
+  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import { PatientHistory } from '../modelo/historial_modelo';
 import { HistorialControl } from '../controlador/historial_controlador';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import CustomHeader from '../../navigation/CustomHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../navigation/types';
+
+type HistorialNavProp = StackNavigationProp<RootStackParamList, 'Historial'>;
 
 const Historial: React.FC = () => {
+  const navigation = useNavigation<HistorialNavProp>();
   const [search, setSearch] = useState('');
   const [patients, setPatients] = useState<PatientHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,35 +31,44 @@ const Historial: React.FC = () => {
   useEffect(() => {
     const fetchHistorial = async () => {
       setIsLoading(true);
-      setError(null);
       try {
         const id_usuario = await AsyncStorage.getItem('id_usuario');
         if (id_usuario) {
-          const fetchedPatients = await HistorialControl.getPatientHistory(id_usuario);
-          setPatients(fetchedPatients);
+          const data = await HistorialControl.getPatientHistory(id_usuario);
+          setPatients(data);
         } else {
-          setError('No se encontró el ID de usuario. Por favor, vuelva a iniciar sesión.');
+          setError('Sesión no encontrada');
         }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error desconocido al cargar el historial.');
+      } catch (err: any) {
+        setError(err.message);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchHistorial();
   }, []);
 
-  const filteredPatients = patients.filter((patient) =>
-    patient.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = patients.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const renderPatient = ({ item }: { item: PatientHistory }) => (
-    <View style={styles.patientItem}>
-      <Text style={styles.patientText}>{item.name}</Text>
-      <Text style={styles.patientSubText}>Última visita: {item.lastVisit}</Text>
-      <Text style={styles.patientSubText}>Diagnóstico: {item.diagnosis}</Text>
-    </View>
+  const handlePress = (patient: PatientHistory) => {
+    navigation.navigate('DetallePaciente', {
+      id_paciente: parseInt(patient.id),
+    });
+  };
+
+  const renderItem = ({ item }: { item: PatientHistory }) => (
+    <TouchableOpacity style={styles.patientItem} onPress={() => handlePress(item)}>
+      <View style={styles.patientContent}>
+        <View>
+          <Text style={styles.patientText}>{item.name}</Text>
+          <Text style={styles.patientSubText}>Última: {item.lastVisit}</Text>
+          <Text style={styles.patientSubText}>Dx: {item.diagnosis}</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color="#4B9CDB" />
+      </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -62,17 +86,16 @@ const Historial: React.FC = () => {
               <TextInput
                 style={styles.searchInput}
                 placeholder="Buscar paciente..."
-                placeholderTextColor="#8A8F9E"
                 value={search}
                 onChangeText={setSearch}
               />
             </View>
             <FlatList
-              data={filteredPatients}
-              renderItem={renderPatient}
+              data={filtered}
+              renderItem={renderItem}
               keyExtractor={(item) => item.id}
               contentContainerStyle={styles.list}
-              ListEmptyComponent={<Text style={styles.noItemsText}>No hay pacientes en el historial.</Text>}
+              ListEmptyComponent={<Text style={styles.noItemsText}>Sin pacientes</Text>}
             />
           </>
         )}
@@ -82,14 +105,8 @@ const Historial: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  safeAreaContainer: {
-    flex: 1,
-    backgroundColor: '#F7FAFD',
-  },
-  container: {
-    flex: 1,
-    padding: 20,
-  },
+  safeAreaContainer: { flex: 1, backgroundColor: '#F7FAFD' },
+  container: { flex: 1, padding: 20 },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -103,17 +120,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  searchIcon: {
-    marginRight: 10,
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
-    color: '#333',
-  },
-  list: {
-    paddingBottom: 20,
-  },
+  searchIcon: { marginRight: 10 },
+  searchInput: { flex: 1, height: 40, color: '#333' },
+  list: { paddingBottom: 20 },
   patientItem: {
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
@@ -125,28 +134,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  patientText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#4B9CDB',
-  },
-  patientSubText: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 5,
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#FF6B6B',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  noItemsText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 20,
-  },
+  patientContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  patientText: { fontSize: 18, fontWeight: '600', color: '#4B9CDB' },
+  patientSubText: { fontSize: 14, color: '#666', marginTop: 5 },
+  errorText: { fontSize: 16, color: '#FF6B6B', textAlign: 'center', marginTop: 20 },
+  noItemsText: { fontSize: 16, color: '#666', textAlign: 'center', marginTop: 20 },
 });
 
 export default Historial;

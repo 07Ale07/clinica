@@ -8,7 +8,7 @@ import RegistroPaciente from "./RegistroPaciente"
 import SeleccionOdontologo from "./SeleccionOdontologo"
 import ConfirmacionTurno from "./ConfirmacionTurno"
 import ProgressHeader from "./components/ProgressHeader"
-import type { Paciente, Turno } from "../modelo/Paciente"
+import type { Paciente, Turno, Odontologo } from "../modelo/Paciente"
 import { turnoStyles } from "../css/sacar-turno-styles"
 import { createFadeInAnimation, createSlideInAnimation } from "../css/animations"
 
@@ -17,6 +17,10 @@ const SacarTurnoMain: React.FC = () => {
   const [paciente, setPaciente] = useState<Paciente | null>(null)
   const [dniInicial, setDniInicial] = useState("")
   const [turnoConfirmado, setTurnoConfirmado] = useState<Turno | null>(null)
+  const [odontologo, setOdontologo] = useState<Odontologo | null>(null)
+  const [fecha, setFecha] = useState("")
+  const [hora, setHora] = useState("")
+  const [email, setEmail] = useState("")
 
   const fadeAnim = useRef(new Animated.Value(0)).current
   const slideAnim = useRef(new Animated.Value(50)).current
@@ -50,8 +54,25 @@ const SacarTurnoMain: React.FC = () => {
     setStep("seleccion")
   }
 
-  const handleTurnoConfirmado = (turno: Turno) => {
+  const handleTurnoConfirmado = (
+    turno: Turno,
+    odont: Odontologo,
+    fechaSeleccionada: string,
+    horaSeleccionada: string,
+    emailIngresado: string,
+  ) => {
+    console.log("[v0] SacarTurnoMain received:", {
+      turno,
+      odont,
+      fechaSeleccionada,
+      horaSeleccionada,
+      emailIngresado,
+    })
     setTurnoConfirmado(turno)
+    setOdontologo(odont)
+    setFecha(fechaSeleccionada)
+    setHora(horaSeleccionada)
+    setEmail(emailIngresado)
     setStep("confirmacion")
   }
 
@@ -59,6 +80,10 @@ const SacarTurnoMain: React.FC = () => {
     setStep("verificar")
     setPaciente(null)
     setTurnoConfirmado(null)
+    setOdontologo(null)
+    setFecha("")
+    setHora("")
+    setEmail("")
   }
 
   const handleVolverPaso = () => {
@@ -98,8 +123,16 @@ const SacarTurnoMain: React.FC = () => {
             onVolver={handleVolverPaso}
           />
         )}
-        {step === "confirmacion" && turnoConfirmado && (
-          <ConfirmacionTurno turno={turnoConfirmado} onVolver={handleVolver} />
+        {step === "confirmacion" && turnoConfirmado && paciente && odontologo && (
+          <ConfirmacionTurno
+            paciente={paciente}
+            odontologo={odontologo}
+            fecha={fecha}
+            hora={hora}
+            email={email}
+            turnoConfirmado={turnoConfirmado}
+            onVolver={handleVolver}
+          />
         )}
       </Animated.View>
     </View>

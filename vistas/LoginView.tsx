@@ -1,8 +1,9 @@
+// ../views/LoginView.tsx
 "use client"
 
 import type React from "react"
 import { useState } from "react"
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView } from "react-native"
+import { View, Text, TextInput, TouchableOpacity, Platform, KeyboardAvoidingView, Alert } from "react-native"
 import { LoginController } from "../controlador/LoginController"
 import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
@@ -19,26 +20,30 @@ const LoginView: React.FC = () => {
   const [contrasena, setContrasena] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [error, setError] = useState<string>("")
 
   const navigation = useNavigation<LoginScreenNavigationProp>()
 
   const handleLogin = async () => {
     setIsLoading(true)
+    setError("")
 
     await LoginController.handleLogin(
       { usuario, contrasena },
       (rol) => {
         setIsLoading(false)
         if (rol === "odontólogo") {
-          navigation.navigate("Odontologo")
+          navigation.replace("Odontologo")
         } else if (rol === "recepcionista") {
-          navigation.navigate("Recepcionista")
+          navigation.replace("Recepcionista")
         } else {
-          navigation.navigate("Home")
+          navigation.replace("Home")
         }
       },
       (errorMessage) => {
         setIsLoading(false)
+        setError(errorMessage)
+        Alert.alert("Error de inicio de sesión", errorMessage)
       },
     )
   }
@@ -59,19 +64,20 @@ const LoginView: React.FC = () => {
           <View style={styles.inputContainer}>
             <Feather name="user" size={24} color="#4B9CDB" style={styles.icon} />
             <TextInput
-              style={styles.input}
+              style={[styles.input, error ? { borderColor: '#e74c3c' } : {}]}
               placeholder="Usuario"
               placeholderTextColor="#8A8F9E"
               value={usuario}
               onChangeText={setUsuario}
               editable={!isLoading}
+              autoCapitalize="none"
             />
           </View>
 
           <View style={styles.inputContainer}>
             <Feather name="lock" size={24} color="#4B9CDB" style={styles.icon} />
             <TextInput
-              style={styles.input}
+              style={[styles.input, error ? { borderColor: '#e74c3c' } : {}]}
               placeholder="Contraseña"
               placeholderTextColor="#8A8F9E"
               value={contrasena}
@@ -84,10 +90,18 @@ const LoginView: React.FC = () => {
             </TouchableOpacity>
           </View>
 
+          {error ? (
+            <Animatable.Text animation="fadeIn" style={styles.errorText}>
+              {error}
+            </Animatable.Text>
+          ) : null}
+
           <Animatable.View animation="pulse" iterationCount="infinite" duration={2000} style={styles.buttonContainer}>
             <TouchableOpacity onPress={handleLogin} disabled={isLoading} style={styles.button}>
               <LinearGradient colors={["#4B9CDB", "#2A6EBB"]} style={styles.buttonGradient}>
-                <Text style={styles.buttonText}>{isLoading ? "Cargando..." : "Iniciar Sesión"}</Text>
+                <Text style={styles.buttonText}>
+                  {isLoading ? "Cargando..." : "Iniciar Sesión"}
+                </Text>
               </LinearGradient>
             </TouchableOpacity>
           </Animatable.View>
@@ -109,6 +123,5 @@ const LoginView: React.FC = () => {
     </LinearGradient>
   )
 }
-
 
 export default LoginView

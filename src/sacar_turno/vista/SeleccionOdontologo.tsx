@@ -18,20 +18,25 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Picker } from "@react-native-picker/picker"
 import DateTimePicker from "@react-native-community/datetimepicker"
-import { obtenerOdontologos, obtenerHorariosDisponibles, confirmarTurno } from "../controlador/SacarTurnoController"
+import {
+  obtenerOdontologos,
+  obtenerHorariosDisponibles,
+  confirmarTurnoConSesion,
+} from "../controlador/SacarTurnoController"
 import type { Odontologo, Turno, Paciente } from "../modelo/Paciente"
 import { turnoStyles } from "../css/sacar-turno-styles"
 import { createScaleAnimation } from "../css/animations"
 
 interface Props {
   paciente: Paciente
-  onTurnoConfirmado: (turno: Turno) => void
+  onTurnoConfirmado: (turno: Turno, odontologo: Odontologo, fecha: string, hora: string, email: string) => void
   onVolver: () => void
 }
 
 const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado, onVolver }) => {
   const [odontologos, setOdontologos] = useState<Odontologo[]>([])
   const [idOdontologo, setIdOdontologo] = useState<number | null>(null)
+  const [odontologoSeleccionado, setOdontologoSeleccionado] = useState<Odontologo | null>(null)
   const [fecha, setFecha] = useState<Date | null>(null)
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [hora, setHora] = useState("")
@@ -55,6 +60,18 @@ const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado, onV
     }
     fetchOdontologos()
   }, [])
+
+  useEffect(() => {
+    if (idOdontologo !== null) {
+      const selected = odontologos.find((odo) => odo.id_persona === idOdontologo)
+      if (selected) {
+        console.log("[v0] Odontólogo seleccionado:", selected)
+        setOdontologoSeleccionado(selected)
+      }
+    } else {
+      setOdontologoSeleccionado(null)
+    }
+  }, [idOdontologo, odontologos])
 
   useEffect(() => {
     if (idOdontologo !== null && fecha) {
@@ -136,7 +153,7 @@ const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado, onV
     setError("")
 
     try {
-      if (idOdontologo === null) {
+      if (idOdontologo === null || !odontologoSeleccionado) {
         throw new Error("Odontólogo no seleccionado")
       }
       const turno: Turno = {
@@ -145,20 +162,27 @@ const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado, onV
         hora,
         email,
       }
-      const confirmado = await confirmarTurno(paciente.id_persona!, turno)
+
+      console.log("[v0] Confirmando turno con odontologo:", odontologoSeleccionado)
+
+      // Confirma el turno
+      const confirmado = await confirmarTurnoConSesion(paciente.id_persona!, turno)
+
+      console.log("[v0] Turno confirmado:", confirmado)
 
       setTimeout(() => {
         setLoading(false)
-        onTurnoConfirmado(confirmado)
+        onTurnoConfirmado(confirmado, odontologoSeleccionado, formatToISO(fecha), hora, email)
       }, 300)
     } catch (err: any) {
       setLoading(false)
       setError(err.message || "Error al confirmar turno")
+      console.log("[v0] Error:", err)
     }
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={{ flex: 1 }} edges={["left", "right", "bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -170,7 +194,7 @@ const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado, onV
               flexGrow: 1,
               paddingHorizontal: 16,
               paddingBottom: 100,
-              justifyContent: 'center',
+              justifyContent: "center",
             }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
@@ -257,7 +281,9 @@ const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado, onV
                           }}
                           disabled={loading}
                         >
-                          <Text style={[turnoStyles.horarioChipText, hora === h && turnoStyles.horarioChipTextSelected]}>
+                          <Text
+                            style={[turnoStyles.horarioChipText, hora === h && turnoStyles.horarioChipTextSelected]}
+                          >
                             {h}
                           </Text>
                         </TouchableOpacity>

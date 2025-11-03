@@ -8,6 +8,7 @@ export type RootStackParamList = {
   Turnos: undefined
   Horarios: undefined
   Historial: undefined
+  id_paciente: undefined
   Inventario: undefined
   TurnoScreen: undefined
   RegistrarPacienteScreen: undefined

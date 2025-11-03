@@ -1,18 +1,30 @@
 "use client"
 
-import type React from "react"
-import { useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react"
 import { View, Text, TouchableOpacity, Animated } from "react-native"
-import type { Turno } from "../modelo/Paciente"
+import type { Turno, Paciente, Odontologo } from "../modelo/Paciente"
 import { turnoStyles } from "../css/sacar-turno-styles"
 import { createScaleAnimation } from "../css/animations"
 
 interface Props {
-  turno: Turno
+  paciente: Paciente
+  odontologo: Odontologo
+  fecha: string
+  hora: string
+  email?: string
+  turnoConfirmado: Turno
   onVolver: () => void
 }
 
-const ConfirmacionTurno: React.FC<Props> = ({ turno, onVolver }) => {
+const ConfirmacionTurno: React.FC<Props> = ({
+  paciente,
+  odontologo,
+  fecha,
+  hora,
+  email,
+  turnoConfirmado,
+  onVolver,
+}) => {
   const scaleAnim = useRef(new Animated.Value(0)).current
   const buttonScale = useRef(new Animated.Value(1)).current
 
@@ -20,9 +32,42 @@ const ConfirmacionTurno: React.FC<Props> = ({ turno, onVolver }) => {
     createScaleAnimation(scaleAnim, 1, 500).start()
   }, [])
 
+  useEffect(() => {
+    console.log("[v0] ConfirmacionTurno received data:")
+    console.log("[v0] paciente:", paciente)
+    console.log("[v0] odontologo:", odontologo)
+    console.log("[v0] fecha:", fecha)
+    console.log("[v0] hora:", hora)
+    console.log("[v0] turnoConfirmado:", turnoConfirmado)
+  }, [])
+
   const formatDate = (dateString: string): string => {
+    if (!dateString) return "Fecha no disponible"
     const [year, month, day] = dateString.split("-")
     return `${day}/${month}/${year}`
+  }
+
+  if (!turnoConfirmado || !odontologo || !paciente || !fecha || !hora) {
+    console.log("[v0] Missing critical data:", {
+      turnoConfirmado: !!turnoConfirmado,
+      odontologo: !!odontologo,
+      paciente: !!paciente,
+      fecha: !!fecha,
+      hora: !!hora,
+    })
+    return (
+      <View style={[turnoStyles.card, { justifyContent: "center", alignItems: "center", minHeight: 300 }]}>
+        <Text style={{ fontSize: 16, color: "#EF4444", textAlign: "center" }}>
+          Error: datos de confirmación incompletos
+        </Text>
+        <Text style={{ fontSize: 12, color: "#666", marginTop: 10, textAlign: "center" }}>
+          Por favor, vuelva al inicio e intente nuevamente
+        </Text>
+        <TouchableOpacity style={[turnoStyles.primaryButton, { marginTop: 20, width: "80%" }]} onPress={onVolver}>
+          <Text style={turnoStyles.primaryButtonText}>Volver</Text>
+        </TouchableOpacity>
+      </View>
+    )
   }
 
   return (
@@ -40,24 +85,38 @@ const ConfirmacionTurno: React.FC<Props> = ({ turno, onVolver }) => {
 
         <View style={turnoStyles.turnoDetailsContainer}>
           <View style={turnoStyles.turnoDetailRow}>
+            <Text style={turnoStyles.turnoDetailLabel}>Paciente</Text>
+            <Text style={turnoStyles.turnoDetailValue}>
+              {paciente.nombre} {paciente.apellido}
+            </Text>
+          </View>
+
+          <View style={turnoStyles.turnoDetailRow}>
+            <Text style={turnoStyles.turnoDetailLabel}>Odontólogo</Text>
+            <Text style={turnoStyles.turnoDetailValue}>
+              Dr/a. {odontologo.nombre} {odontologo.apellido}
+            </Text>
+          </View>
+
+          <View style={turnoStyles.turnoDetailRow}>
             <Text style={turnoStyles.turnoDetailLabel}>Fecha</Text>
-            <Text style={turnoStyles.turnoDetailValue}>{formatDate(turno.fecha)}</Text>
+            <Text style={turnoStyles.turnoDetailValue}>{formatDate(fecha)}</Text>
           </View>
 
           <View style={turnoStyles.turnoDetailRow}>
             <Text style={turnoStyles.turnoDetailLabel}>Hora</Text>
-            <Text style={turnoStyles.turnoDetailValue}>{turno.hora}</Text>
+            <Text style={turnoStyles.turnoDetailValue}>{hora}</Text>
           </View>
 
-          {turno.email && (
+          {email && (
             <View style={[turnoStyles.turnoDetailRow, { borderBottomWidth: 0 }]}>
               <Text style={turnoStyles.turnoDetailLabel}>Email</Text>
-              <Text style={turnoStyles.turnoDetailValue}>{turno.email}</Text>
+              <Text style={turnoStyles.turnoDetailValue}>{email}</Text>
             </View>
           )}
         </View>
 
-        {turno.email && (
+        {email && (
           <View style={turnoStyles.successContainer}>
             <Text style={turnoStyles.successText}>Se ha enviado una confirmación a su correo electrónico</Text>
           </View>

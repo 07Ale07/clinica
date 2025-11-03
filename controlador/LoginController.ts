@@ -1,6 +1,7 @@
+// ../controlador/LoginController.ts
 import { type LoginResponse, type LoginCredentials, LoginModel } from "../modelo/LoginModel"
 import { apiService } from "../src/services/api"
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import { guardarSesion } from "../src/services/sesion"
 
 export class LoginController {
   static async handleLogin(
@@ -9,28 +10,33 @@ export class LoginController {
     onError: (message: string) => void,
   ): Promise<void> {
     try {
-      // Validar credenciales
+      // Validar campos
       if (!LoginModel.validateCredentials(credentials.usuario, credentials.contrasena)) {
         onError("Por favor, complete todos los campos")
         return
       }
 
-      // Realizar login
+      // Llamar a la API
       const response: LoginResponse = await apiService.login(credentials)
 
-      if (response.success && response.rol) {
-        // Almacenar id_usuario en AsyncStorage
-        if (response.id_usuario) {
-          await AsyncStorage.setItem("id_usuario", response.id_usuario.toString())
-        } else {
-          console.warn("id_usuario no incluido en la respuesta de la API")
-        }
+      if (response.success && response.rol && response.id_usuario) {
+        const idStr = response.id_usuario.toString()
+
+        // Guardar sesión completa
+        await guardarSesion(
+          credentials.usuario,
+          idStr,
+          response.rol as 'odontologo' | 'recepcionista'
+        )
+
+        // Éxito
         onSuccess(response.rol)
       } else {
         onError(response.message || "Usuario o contraseña incorrectos")
       }
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Error desconocido")
+      const mensaje = error instanceof Error ? error.message : "Error de conexión"
+      onError(mensaje)
     }
   }
 }

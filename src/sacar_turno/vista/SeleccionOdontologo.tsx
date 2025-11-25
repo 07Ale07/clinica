@@ -1,7 +1,5 @@
-"use client"
-
-import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef } from "react"
+import type { FC } from "react"
 import {
   View,
   Text,
@@ -33,7 +31,7 @@ interface Props {
   onVolver: () => void
 }
 
-const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado, onVolver }) => {
+const SeleccionOdontologo: FC<Props> = ({ paciente, onTurnoConfirmado, onVolver }) => {
   const [odontologos, setOdontologos] = useState<Odontologo[]>([])
   const [idOdontologo, setIdOdontologo] = useState<number | null>(null)
   const [odontologoSeleccionado, setOdontologoSeleccionado] = useState<Odontologo | null>(null)
@@ -78,7 +76,8 @@ const SeleccionOdontologo: React.FC<Props> = ({ paciente, onTurnoConfirmado, onV
       async function fetchHorarios() {
         setLoadingHorarios(true)
         try {
-          const lista = await obtenerHorariosDisponibles(idOdontologo, formatToISO(fecha))
+          // Aseguramos a TypeScript que idOdontologo no es null
+          const lista = await obtenerHorariosDisponibles(idOdontologo as number, formatToISO(fecha))
           setHorarios(lista)
           setHora("")
         } catch (err) {

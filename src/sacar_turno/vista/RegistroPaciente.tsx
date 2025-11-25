@@ -1,7 +1,5 @@
-"use client"
-
-import type React from "react"
-import { useState, useRef } from "react"
+import React, { useState, useRef } from "react"
+import type { FC } from "react"
 import {
   View,
   Text,
@@ -28,7 +26,7 @@ interface Props {
   onVolver: () => void
 }
 
-const RegistroPaciente: React.FC<Props> = ({ dniInicial, onRegistroCompletado, onVolver }) => {
+const RegistroPaciente: FC<Props> = ({ dniInicial, onRegistroCompletado, onVolver }) => {
   const [nombre, setNombre] = useState("")
   const [apellido, setApellido] = useState("")
   const [fechaNac, setFechaNac] = useState<Date | null>(null)

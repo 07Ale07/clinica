@@ -1,8 +1,17 @@
+// LandingView.tsx
 "use client"
 
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import { View, Text, ScrollView, TouchableOpacity, Dimensions, Animated, Linking } from "react-native"
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+  Animated,
+  Linking,
+} from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
@@ -43,15 +52,17 @@ const LandingView: React.FC = () => {
     return () => clearInterval(interval)
   }, [data.procedures.length])
 
-  const handleWhatsApp = () => {
-    const phoneNumber = "3704037812"
-    const message = "Hola, me interesa saber más sobre sus servicios"
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-    Linking.openURL(url)
-  }
-
-  const handleLogin = () => {
-    navigation.navigate("Login")
+  // WhatsApp con número dinámico desde la base de datos
+  const handleWhatsApp = async () => {
+    try {
+      await LandingController.openWhatsApp()
+    } catch (error) {
+      // Fallback silencioso: si falla la API, abre WhatsApp con número por defecto
+      const fallbackUrl = "https://wa.me/5493704037812?text=Hola,%20me%20interesa%20saber%20más%20sobre%20sus%20servicios"
+      Linking.canOpenURL(fallbackUrl).then((supported) => {
+        if (supported) Linking.openURL(fallbackUrl)
+      })
+    }
   }
 
   return (
@@ -65,17 +76,38 @@ const LandingView: React.FC = () => {
           </Text>
         </LinearGradient>
 
-        {/* Header con Logo y Botones */}
+        {/* Header con Logo y 3 Botones */}
         <View style={landingStyles.header}>
           <View style={landingStyles.logoContainer}>
             <Ionicons name="fitness" size={40} color="#00d4aa" />
             <Text style={landingStyles.logoText}>DentalSmile</Text>
           </View>
 
-          <TouchableOpacity style={landingStyles.loginButton} onPress={handleLogin}>
-            <Ionicons name="log-in-outline" size={20} color="#1a4b8c" />
-            <Text style={landingStyles.loginButtonText}>Iniciar Sesión, Ver y Sacar Turnos</Text>
-          </TouchableOpacity>
+          <View style={landingStyles.headerButtonsContainer}>
+            <TouchableOpacity
+              style={landingStyles.headerButton}
+              onPress={() => navigation.navigate("Login")}
+            >
+              <Ionicons name="log-in-outline" size={20} color="#1a4b8c" />
+              <Text style={landingStyles.headerButtonText}>Iniciar Sesión</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={landingStyles.headerButton}
+              onPress={() => navigation.navigate("TurnoConsulta")}
+            >
+              <Ionicons name="search-outline" size={20} color="#1a4b8c" />
+              <Text style={landingStyles.headerButtonText}>Mis Turnos</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={landingStyles.headerButton}
+              onPress={() => navigation.navigate("SacarTurno")}
+            >
+              <Ionicons name="calendar-outline" size={20} color="#1a4b8c" />
+              <Text style={landingStyles.headerButtonText}>Sacar Turno</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Hero Section */}
@@ -83,7 +115,7 @@ const LandingView: React.FC = () => {
           <Animated.View style={{ opacity: fadeAnim }}>
             <Ionicons name="fitness" size={80} color="#fff" style={landingStyles.heroIcon} />
             <Text style={landingStyles.heroTitle}>DentalSmile Premium</Text>
-            <Text style={landingStyles.heroSubtitle}>Sonrisas perfectas, cuidado excepcional</Text>
+            <Text style={landingStyles.heroSubtitle}>Sonrisas perfectas perfectas, cuidado excepcional</Text>
             <Text style={landingStyles.heroDescription}>Transformamos Sonrisas, Creamos Confianza</Text>
           </Animated.View>
         </LinearGradient>
@@ -94,7 +126,7 @@ const LandingView: React.FC = () => {
             <Ionicons name="medical" size={28} color="#1a4b8c" />
             <Text style={landingStyles.sectionTitle}>Nuestros Procedimientos</Text>
           </View>
-          <Text style={landingStyles.sectionSubtitle}>Ofrecemos los tratamientos dentales más avanzados</Text>
+          <Text style={landingStyles.sectionSubtitle}>Ofrecemos los tratamientos dentales avanzados</Text>
 
           <View style={landingStyles.carouselContainer}>
             <ScrollView
@@ -116,7 +148,7 @@ const LandingView: React.FC = () => {
                     <Text style={landingStyles.procedureTitle}>{procedure.descripcion}</Text>
                     <Text style={landingStyles.procedurePrice}>${procedure.costo}</Text>
                     <Text style={landingStyles.procedureDescription}>
-                      Tratamiento profesional con la más alta calidad y tecnología avanzada
+                      Tratamiento profesional con tecnología de vanguardia
                     </Text>
                     <TouchableOpacity style={landingStyles.procedureButton}>
                       <Text style={landingStyles.procedureButtonText}>Más Información</Text>
@@ -126,12 +158,14 @@ const LandingView: React.FC = () => {
               ))}
             </ScrollView>
 
-            {/* Indicadores del carrusel */}
             <View style={landingStyles.carouselIndicators}>
               {data.procedures.map((_, index) => (
                 <View
                   key={index}
-                  style={[landingStyles.indicator, currentSlide === index && landingStyles.indicatorActive]}
+                  style={[
+                    landingStyles.indicator,
+                    currentSlide === index && landingStyles.indicatorActive,
+                  ]}
                 />
               ))}
             </View>
@@ -144,8 +178,7 @@ const LandingView: React.FC = () => {
             <Ionicons name="hardware-chip" size={50} color="#00d4aa" />
             <Text style={landingStyles.infoTitle}>Tecnología de Vanguardia</Text>
             <Text style={landingStyles.infoText}>
-              Utilizamos la tecnología más avanzada en odontología para garantizar diagnósticos precisos y tratamientos
-              mínimamente invasivos.
+              Diagnósticos precisos y tratamientos mínimamente invasivos con equipos de última generación.
             </Text>
           </View>
 
@@ -153,8 +186,7 @@ const LandingView: React.FC = () => {
             <Ionicons name="people" size={50} color="#00d4aa" />
             <Text style={landingStyles.infoTitle}>Enfoque Personalizado</Text>
             <Text style={landingStyles.infoText}>
-              Diseñamos planes de tratamiento personalizados que se adaptan a tus necesidades específicas y objetivos
-              estéticos.
+              Planes únicos adaptados a tus necesidades y objetivos estéticos.
             </Text>
           </View>
 
@@ -162,8 +194,7 @@ const LandingView: React.FC = () => {
             <Ionicons name="star" size={50} color="#00d4aa" />
             <Text style={landingStyles.infoTitle}>Compromiso con la Excelencia</Text>
             <Text style={landingStyles.infoText}>
-              Seguimos los más altos estándares internacionales de calidad y seguridad en cada aspecto de nuestra
-              práctica.
+              Estándares internacionales de calidad y bioseguridad en cada consulta.
             </Text>
           </View>
         </View>
@@ -174,10 +205,9 @@ const LandingView: React.FC = () => {
           <View style={landingStyles.testimonialCard}>
             <Ionicons name="chatbox-ellipses" size={40} color="#00d4aa" />
             <Text style={landingStyles.testimonialText}>
-              "Llevo años confiando en DentalCare para el cuidado de mi familia. Los resultados son siempre
-              excepcionales y el trato es increíblemente profesional."
+              "La atención es excelente, los resultados superaron mis expectativas. ¡Totalmente recomendado!"
             </Text>
-            <Text style={landingStyles.testimonialAuthor}>- María González, paciente desde 2018</Text>
+            <Text style={landingStyles.testimonialAuthor}>- María González</Text>
           </View>
         </View>
 
@@ -198,8 +228,10 @@ const LandingView: React.FC = () => {
                 <Text style={landingStyles.employeeName}>
                   Dr. {employee.nombre} {employee.apellido}
                 </Text>
-                <Text style={landingStyles.employeeRole}>{employee.especialidad || "Especialista Dental"}</Text>
-                <Text style={landingStyles.employeeDesc}>Años de experiencia brindando sonrisas perfectas</Text>
+                <Text style={landingStyles.employeeRole}>
+                  {employee.especialidad || "Especialista Dental"}
+                </Text>
+                <Text style={landingStyles.employeeDesc}>Años de experiencia creando sonrisas</Text>
               </View>
             ))}
           </View>
@@ -211,7 +243,7 @@ const LandingView: React.FC = () => {
             <Ionicons name="shield-checkmark" size={28} color="#1a4b8c" />
             <Text style={landingStyles.sectionTitle}>Obras Sociales</Text>
           </View>
-          <Text style={landingStyles.sectionSubtitle}>Trabajamos con las principales obras sociales</Text>
+          <Text style={landingStyles.sectionSubtitle}>Trabajamos con las principales prepagas</Text>
 
           <View style={landingStyles.insuranceGrid}>
             {data.socialWorks.map((work, index) => (
@@ -234,7 +266,7 @@ const LandingView: React.FC = () => {
         {/* Footer */}
         <LinearGradient colors={["#1a4b8c", "#0d2847"]} style={landingStyles.footer}>
           <Ionicons name="fitness" size={50} color="#00d4aa" />
-          <Text style={landingStyles.footerTitle}>DentalCare Premium</Text>
+          <Text style={landingStyles.footerTitle}>DentalSmile Premium</Text>
           <Text style={landingStyles.footerSubtitle}>Tu sonrisa es nuestra pasión</Text>
 
           <View style={landingStyles.socialLinks}>
@@ -252,11 +284,13 @@ const LandingView: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          <Text style={landingStyles.footerCopyright}>© 2025 DentalCare Premium. Todos los derechos reservados.</Text>
+          <Text style={landingStyles.footerCopyright}>
+            © 2025 DentalSmile Premium. Todos los derechos reservados.
+          </Text>
         </LinearGradient>
       </ScrollView>
 
-      {/* Botón flotante de WhatsApp */}
+      {/* Botón Flotante WhatsApp - Número desde DB */}
       <TouchableOpacity style={landingStyles.floatingButton} onPress={handleWhatsApp}>
         <Ionicons name="logo-whatsapp" size={32} color="#fff" />
       </TouchableOpacity>

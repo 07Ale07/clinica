@@ -4,5 +4,5 @@ export interface TurnoInfo {
   apellido: string;
   motivo: string;
   fecha: string;
-  estado: string;
+  estado?: string;
 }

@@ -1,7 +1,5 @@
-"use client"
-
-import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef } from "react"
+import type { FC } from "react"
 import { View, Animated } from "react-native"
 import VerificarPaciente from "./VerificarPaciente"
 import RegistroPaciente from "./RegistroPaciente"
@@ -12,7 +10,7 @@ import type { Paciente, Turno, Odontologo } from "../modelo/Paciente"
 import { turnoStyles } from "../css/sacar-turno-styles"
 import { createFadeInAnimation, createSlideInAnimation } from "../css/animations"
 
-const SacarTurnoMain: React.FC = () => {
+const SacarTurnoMain: FC = () => {
   const [step, setStep] = useState<"verificar" | "registro" | "seleccion" | "confirmacion">("verificar")
   const [paciente, setPaciente] = useState<Paciente | null>(null)
   const [dniInicial, setDniInicial] = useState("")

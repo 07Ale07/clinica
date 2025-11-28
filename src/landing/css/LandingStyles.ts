@@ -23,7 +23,8 @@ export const landingStyles = StyleSheet.create({
   },
   header: {
     backgroundColor: "#fff",
-    padding: 16,
+    paddingHorizontal: 16, // Ajustado para dar espacio lateral
+    paddingVertical: 12,   // Ajustado para altura
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -32,17 +33,49 @@ export const landingStyles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+    zIndex: 10, // Asegura que el header esté por encima
   },
   logoContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    flexShrink: 1, // Permite que el logo se encoja si falta espacio
   },
   logoText: {
-    fontSize: 24,
+    fontSize: 20, // Ligeramente ajustado para móvil
     fontWeight: "700",
     color: "#1a4b8c",
   },
+  // --- SECCIÓN MODIFICADA: CONTENEDOR DE BOTONES ---
+  headerButtonsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8, // Espacio entre botones
+    // Se eliminó marginTop y flexWrap para alinear con el logo
+  },
+  // --- SECCIÓN MODIFICADA: ESTILO DE BOTONES ---
+  headerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingVertical: 6,      // Reducido (antes era mayor)
+    paddingHorizontal: 10,   // Reducido para que quepan
+    borderRadius: 20,         // QUITADO EL BORDE REDONDO (antes 30)
+    borderWidth: 1,
+    borderColor: "#1a4b8c",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  headerButtonText: {
+    marginLeft: 4,
+    color: "#1a4b8c",
+    fontWeight: "600",
+    fontSize: 14, // AUMENTADO (antes era 7)
+  },
+  // ------------------------------------------------
   loginButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -387,37 +420,5 @@ export const landingStyles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 8,
     elevation: 8,
-  },
-  headerButtonsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 12,
-    marginTop: 16,
-    paddingHorizontal: 20,
-  },
-
-
-
-  headerButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    paddingVertical: 5,
-    paddingHorizontal: 16,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: "#1a4b8c",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  headerButtonText: {
-    marginLeft: 8,
-    color: "#1a4b8c",
-    fontWeight: "600",
-    fontSize: 7,
   },
 })

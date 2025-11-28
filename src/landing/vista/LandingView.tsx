@@ -1,7 +1,7 @@
 // LandingView.tsx
 "use client"
 
-import type React from "react"
+import React from "react"
 import { useState, useEffect, useRef } from "react"
 import {
   View,
@@ -76,22 +76,37 @@ const LandingView: React.FC = () => {
           </Text>
         </LinearGradient>
 
-        {/* Header con Logo y 3 Botones */}
-        <View style={landingStyles.header}>
-          <View style={landingStyles.logoContainer}>
-            <Ionicons name="fitness" size={40} color="#00d4aa" />
-            <Text style={landingStyles.logoText}>DentalSmile</Text>
-          </View>
+        {/* MODIFICACIÓN: Header con Logo y Login alineados y botones de acción debajo */}
+        <View style={[landingStyles.header, { paddingHorizontal: 15 }]}>
+          
+          {/* Fila Superior: Logo (Izq) - Login (Der) */}
+          <View style={{ 
+            flexDirection: 'row', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            width: '100%',
+            marginBottom: 20 // Espacio entre el header y los botones de abajo
+          }}>
+            {/* Logo */}
+            <View style={landingStyles.logoContainer}>
+              <Ionicons name="fitness" size={40} color="#00d4aa" />
+              <Text style={landingStyles.logoText}>DentalSmile</Text>
+            </View>
 
-          <View style={landingStyles.headerButtonsContainer}>
+            {/* Botón Iniciar Sesión (Movido aquí) */}
             <TouchableOpacity
-              style={landingStyles.headerButton}
+              style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0f4f8', padding: 8, borderRadius: 20 }}
               onPress={() => navigation.navigate("Login")}
             >
-              <Ionicons name="log-in-outline" size={20} color="#1a4b8c" />
-              <Text style={landingStyles.headerButtonText}>Iniciar Sesión</Text>
+              <Ionicons name="log-in-outline" size={24} color="#1a4b8c" />
+              <Text style={[landingStyles.headerButtonText, { marginLeft: 5, color: '#1a4b8c', fontWeight: 'bold' }]}>
+                Ingresar
+              </Text>
             </TouchableOpacity>
+          </View>
 
+          {/* Fila Inferior: Botones de Turnos (Dos botones restantes) */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
             <TouchableOpacity
               style={landingStyles.headerButton}
               onPress={() => navigation.navigate("TurnoConsulta")}
@@ -109,6 +124,7 @@ const LandingView: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+        {/* FIN DE MODIFICACIÓN DEL HEADER */}
 
         {/* Hero Section */}
         <LinearGradient colors={["#1a4b8c", "#2c5aa0", "#00d4aa"]} style={landingStyles.heroSection}>

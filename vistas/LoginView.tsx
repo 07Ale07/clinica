@@ -37,7 +37,11 @@ const LoginView: React.FC = () => {
         } else if (rol === "recepcionista") {
           navigation.replace("Recepcionista")
         } else {
-          navigation.replace("Home")
+          // Rol desconocido o no autorizado
+          Alert.alert(
+            "Acceso denegado",
+            `El rol "${rol}" no tiene pantalla asignada en la app.`
+          )
         }
       },
       (errorMessage) => {

@@ -32,7 +32,8 @@ const LoginView: React.FC = () => {
       { usuario, contrasena },
       (rol) => {
         setIsLoading(false)
-        if (rol === "odontólogo") {
+        // Navegación actualizada para coincidir con los tipos de rol
+        if (rol === "odontologo") {
           navigation.replace("Odontologo")
         } else if (rol === "recepcionista") {
           navigation.replace("Recepcionista")

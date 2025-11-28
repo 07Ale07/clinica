@@ -1,7 +1,7 @@
 export interface LoginResponse {
   id_usuario: number;
   success: boolean;
-  rol?: string;
+  rol?: 'odontologo' | 'recepcionista'; // Tipos actualizados
   message?: string;
 }
 

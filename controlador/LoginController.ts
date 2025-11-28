@@ -22,13 +22,15 @@ export class LoginController {
       if (response.success && response.rol && response.id_usuario) {
         const idStr = response.id_usuario.toString()
 
-        // Guardar sesión completa
+        // Guardar sesión completa usando el servicio
         await guardarSesion(
           credentials.usuario,
           idStr,
-          response.rol as 'odontologo' | 'recepcionista'
+          response.rol // Ya está tipado como 'odontologo' | 'recepcionista'
         )
 
+        console.log('✅ Sesión guardada correctamente para:', credentials.usuario)
+        
         // Éxito
         onSuccess(response.rol)
       } else {
@@ -36,6 +38,7 @@ export class LoginController {
       }
     } catch (error) {
       const mensaje = error instanceof Error ? error.message : "Error de conexión"
+      console.error('❌ Error en login:', mensaje)
       onError(mensaje)
     }
   }
